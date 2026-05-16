@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbbhud000000"]
+
+[ext_resource type="Script" path="res://scripts/ui/virtual_joystick.gd" id="1_js"]
+
+[node name="HUD" type="CanvasLayer"]
+
+[node name="HPBar" type="ProgressBar" parent="."]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 320.0
+offset_bottom = 40.0
+max_value = 100.0
+value = 100.0
+
+[node name="TimerLabel" type="Label" parent="."]
+offset_left = 16.0
+offset_top = 48.0
+offset_right = 320.0
+offset_bottom = 80.0
+text = "10:00"
+
+[node name="Joystick" type="Control" parent="."]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -320.0
+offset_right = 352.0
+offset_bottom = -32.0
+script = ExtResource("1_js")

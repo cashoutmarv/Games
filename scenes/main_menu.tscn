@@ -1,0 +1,85 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbbmenu00000"]
+
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_menu"]
+
+[node name="MainMenu" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_menu")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.1, 0.1, 0.15, 1)
+
+[node name="V" type="VBoxContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = 200.0
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Title" type="Label" parent="V"]
+text = "BOSS BATTLE BELAY"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+
+[node name="PhaseLabel" type="Label" parent="V"]
+text = "Phase: NORMAL_FIGHT"
+horizontal_alignment = 1
+
+[node name="RunsLabel" type="Label" parent="V"]
+text = "Runs: 0   Eggs: 0"
+horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="V"]
+custom_minimum_size = Vector2(0, 56)
+text = "Start"
+
+[node name="ContinueButton" type="Button" parent="V"]
+custom_minimum_size = Vector2(0, 56)
+text = "Continue"
+visible = false
+
+[node name="FilesButton" type="Button" parent="V"]
+custom_minimum_size = Vector2(0, 56)
+text = "Files"
+visible = false
+
+[node name="DebugPanel" type="PanelContainer" parent="."]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -240.0
+offset_right = 280.0
+offset_bottom = -16.0
+grow_vertical = 0
+
+[node name="V" type="VBoxContainer" parent="DebugPanel"]
+
+[node name="Label" type="Label" parent="DebugPanel/V"]
+text = "Debug"
+
+[node name="BumpRuns" type="Button" parent="DebugPanel/V"]
+text = "Bump runs +1"
+
+[node name="AddEggs" type="Button" parent="DebugPanel/V"]
+text = "Add 3 eggs"
+
+[node name="ToggleDeleted" type="Button" parent="DebugPanel/V"]
+text = "Toggle boss_deleted"
+
+[node name="OpenFiles" type="Button" parent="DebugPanel/V"]
+text = "Open Files (force)"
+
+[node name="ResetSave" type="Button" parent="DebugPanel/V"]
+text = "Reset save"

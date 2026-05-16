@@ -1,0 +1,9 @@
+{
+  "eggs": [
+    {"id": "echo",   "name": "Echo",   "where_hidden": "north wall, arena, hold position 3s"},
+    {"id": "ghost",  "name": "Ghost",  "where_hidden": "boss room, behind throne"},
+    {"id": "seam",   "name": "Seam",   "where_hidden": "loose tile, southeast corner of arena"},
+    {"id": "vessel", "name": "Vessel", "where_hidden": "menu, hold the title 5s"},
+    {"id": "warden", "name": "Warden", "where_hidden": "complete run without firing once"}
+  ]
+}

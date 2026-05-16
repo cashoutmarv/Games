@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbbdlg000000"]
+
+[ext_resource type="Script" path="res://scripts/ui/dialogue_box.gd" id="1_dlg"]
+
+[node name="DialogueBox" type="PanelContainer"]
+custom_minimum_size = Vector2(800, 120)
+script = ExtResource("1_dlg")
+
+[node name="Margin" type="MarginContainer" parent="."]
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Label" type="Label" parent="Margin"]
+text = ""
+autowrap_mode = 3
+horizontal_alignment = 1

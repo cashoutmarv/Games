@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://bbbboss_rm00"]
+
+[ext_resource type="Script" path="res://scripts/boss_room.gd" id="1_br"]
+[ext_resource type="PackedScene" path="res://scenes/actors/boss.tscn" id="2_boss"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dialogue_box.tscn" id="3_dlg"]
+
+[node name="BossRoom" type="Node2D"]
+script = ExtResource("1_br")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 1080.0
+offset_bottom = 1920.0
+color = Color(0.08, 0.05, 0.12, 1)
+
+[node name="Boss" parent="." instance=ExtResource("2_boss")]
+position = Vector2(540, 500)
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="DialogueBox" parent="UI" instance=ExtResource("3_dlg")]
+offset_left = 140.0
+offset_top = 1600.0
+offset_right = 940.0
+offset_bottom = 1720.0

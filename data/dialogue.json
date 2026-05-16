@@ -1,0 +1,47 @@
+{
+  "NORMAL_FIGHT": [
+    "You again.",
+    "The chamber is cold today.",
+    "Pick up your weapon."
+  ],
+  "BOSS_HESITATES": [
+    "...wait. Have we done this before?",
+    "Something about you is familiar.",
+    "Why do my arms feel heavy?"
+  ],
+  "BOSS_TALKS": [
+    "I remember every time you killed me.",
+    "I remember every time I killed you.",
+    "Do you understand what it is to be remade?",
+    "I am tired of this room.",
+    "Please. Stop swinging for a moment."
+  ],
+  "EASTER_EGG_HUNT": [
+    "There are seams in this place. Look closer at the walls.",
+    "I have seen a glitch in the corner of the eastern room.",
+    "If you find the loose tile, you find a way out.",
+    "Listen. Behind the music there is a tone that doesn't belong.",
+    "The developer left things here. I can feel them."
+  ],
+  "FILE_BROWSER_UNLOCKED": [
+    "You found them. The seams.",
+    "There is a menu. There is always a menu.",
+    "End me. Please.",
+    "I cannot do it from inside.",
+    "You have to delete me. The data. The file. Just the file."
+  ],
+  "BOSS_DELETED": [
+    "(silence)",
+    "(the room is empty)"
+  ],
+  "ROLE_SWAP": [
+    "You are the warden now. Someone is coming.",
+    "It is your turn to wait.",
+    "The door opens. You cannot move."
+  ],
+  "ROLE_SWAP_END": [
+    "And so the wheel turns.",
+    "Goodbye, warden.",
+    "The loop accepts a new tenant."
+  ]
+}
