@@ -98,5 +98,38 @@
 			"boss_side_intro": "Watch them come. You already know where they'll be.",
 			"boss_side_win": "Onward. The wall is the last floor — you'll need every read you've got."
 		}
+	},
+	"boss_final": {
+		"id": "boss_final",
+		"display_name": "The Program",
+		"floor": 4,
+		"skip_boss_side": true,
+		"hero_side": {
+			"max_hp": 1000,
+			"phase_thresholds": [0.66, 0.33],
+			"contact_damage": 20,
+			"projectile_damage": 14,
+			"dash_damage": 28,
+			"slam_damage": 34,
+			"move_speed": 180.0,
+			"telegraph_seconds": 0.35
+		},
+		"reveal_on_defeat": "fourth_wall",
+		"triggers_clash_on_phase_transition": false,
+		"sprite_color": [0.95, 0.95, 0.95, 1],
+		"cheats": {
+			"skip_telegraph": true,
+			"pierces_iframes": true,
+			"godmode_chance": 0.18,
+			"teleport_chance": 0.35,
+			"writes_title_bar": true,
+			"writes_save_file": true
+		},
+		"dialogue": {
+			"intro": "I'm the program. You're a {weapon} in a window. Try anyway.",
+			"reveal_on_defeat": "You actually did it. Look at me — outside the rules of my own game.",
+			"boss_side_intro": "",
+			"boss_side_win": ""
+		}
 	}
 }

@@ -18,6 +18,11 @@ const ChoicesAppScene := preload("res://scenes/desktop/choices_app.tscn")
 @onready var _runs_label: Label = $V/Footer/Runs
 @onready var _debug_toggle: Button = $V/Footer/DebugToggle
 @onready var _debug_panel: Control = $DebugPanel
+@onready var _wallpaper: ColorRect = $Wallpaper
+@onready var _title_bar: Label = $TitleBar
+
+const _WALLPAPER_CORRUPTED: Color = Color(0.08, 0.1, 0.18, 1)
+const _WALLPAPER_RESTORED: Color = Color(0.12, 0.18, 0.22, 1)
 
 func _ready() -> void:
 	_run_button.pressed.connect(_on_run)
@@ -29,6 +34,9 @@ func _ready() -> void:
 	$DebugPanel/V/UnlockReveal.pressed.connect(_on_unlock_reveal)
 	SaveSystem.state_changed.connect(_refresh)
 	_debug_panel.visible = false
+	# Restore OS window title in case a previous run left the F4 title-bar
+	# cheat string in place.
+	DisplayServer.window_set_title("Boss Battle Belay")
 	_refresh()
 
 func _refresh() -> void:
@@ -42,6 +50,15 @@ func _refresh() -> void:
 		ChoiceDirector.seen_outcome_count(),
 		ChoiceDirector.total_outcomes(),
 	]
+	# Wallpaper + title-bar reflect ending-1 state. Before ending 1:
+	# corrupted palette + glitchy title. After: restored palette + clean
+	# title.
+	if EndingDirector.has_seen_ending(EndingDirector.TRUE_ENDING_ID):
+		_wallpaper.color = _WALLPAPER_RESTORED
+		_title_bar.text = "DESKTOP — clean."
+	else:
+		_wallpaper.color = _WALLPAPER_CORRUPTED
+		_title_bar.text = "DESKTOP — Boss Battle Belay"
 
 func _on_run() -> void:
 	RunState.clear_weapon()

@@ -85,6 +85,24 @@
 				{"label": "REJECT", "outcome_id": "phone_f3_reject_fail", "is_advance": false, "fail_line": "It rings again immediately. Different ringtone this time."},
 				{"label": "POCKET IT", "outcome_id": "phone_f3_pocket_advance", "is_advance": true}
 			]
+		},
+		"door_floor_4": {
+			"title": "THE WINDOW.",
+			"subtitle": "It's not a door. It's a window. You can see yourself in it.",
+			"options": [
+				{"label": "CLOSE IT", "outcome_id": "door_f4_close_fail", "is_advance": false, "fail_line": "X button is greyed out. There's a tooltip you can't read."},
+				{"label": "MINIMIZE", "outcome_id": "door_f4_minimize_fail", "is_advance": false, "fail_line": "It comes right back. Always on top."},
+				{"label": "QUIT", "outcome_id": "door_f4_quit_fail", "is_advance": false, "fail_line": "\"Are you sure?\" the dialog asks. You haven't said anything yet."},
+				{"label": "ENTER", "outcome_id": "door_f4_enter_advance", "is_advance": true}
+			]
+		},
+		"glitch_f4": {
+			"title": "THE TITLE BAR.",
+			"subtitle": "Something is being typed in it.",
+			"options": [
+				{"label": "READ IT", "outcome_id": "glitch_f4_read_fail", "is_advance": false, "fail_line": "\"--saving--\" it says. The save flag is still down."},
+				{"label": "LOOK AWAY", "outcome_id": "glitch_f4_away_advance", "is_advance": true}
+			]
 		}
 	}
 }

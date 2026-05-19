@@ -30,6 +30,7 @@ WeaponDict="*res://autoload/weapon_dict.gd"
 ChoiceDirector="*res://autoload/choice_director.gd"
 PatternTracker="*res://autoload/pattern_tracker.gd"
 ClashDirector="*res://autoload/clash_director.gd"
+EndingDirector="*res://autoload/ending_director.gd"
 
 [display]
 

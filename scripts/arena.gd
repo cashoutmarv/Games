@@ -42,6 +42,14 @@ const _FLOOR_THEMES: Dictionary = {
 		"door_screen": "door_floor_3",
 		"scatter_screen": "phone_f3",
 	},
+	4: {
+		"bg": Color(0.04, 0.04, 0.06, 1),
+		"floor": Color(0.08, 0.08, 0.10, 1),
+		"hint": "Indeterminate space. The desktop, but wrong.",
+		"scatter_label": "[title-bar]",
+		"door_screen": "door_floor_4",
+		"scatter_screen": "glitch_f4",
+	},
 }
 
 func _ready() -> void:

@@ -21,6 +21,13 @@ signal pattern_started(pattern_id: String)
 @export var triggers_clash_on_phase_transition: bool = false
 @export var clash_win_damage: int = 60
 @export var clash_loss_damage: int = 35
+# F4 4th-wall cheats — bundle of flags only the final boss enables.
+@export var cheat_skip_telegraph: bool = false  # untelegraphed attacks
+@export var cheat_pierces_iframes: bool = false  # boss projectiles bypass player invuln
+@export var cheat_godmode_chance: float = 0.0  # chance to reject incoming damage [0..1]
+@export var cheat_teleport_chance: float = 0.0  # chance to teleport behind player per pattern [0..1]
+@export var cheat_writes_title_bar: bool = false  # writes HP + taunts to OS title bar
+@export var cheat_writes_save_file: bool = false  # appends taunt lines to the save during fight
 
 # Patterns recharge with a base cooldown that shortens by phase.
 @export var pattern_cooldown_phase_1: float = 2.4
@@ -105,9 +112,20 @@ func _start_next_pattern() -> void:
 			options = [Pattern.FAN]
 	_pattern = options[_pattern_queue_index % options.size()]
 	_pattern_queue_index += 1
-	_telegraph_timer = telegraph_seconds
+	_telegraph_timer = 0.0 if cheat_skip_telegraph else telegraph_seconds
+	# Cheat: occasional pre-pattern teleport behind the player (no-clip flavor).
+	if cheat_teleport_chance > 0.0 and randf() < cheat_teleport_chance:
+		_teleport_near_player()
 	var pid := _pattern_name(_pattern)
 	pattern_started.emit(pid)
+
+func _teleport_near_player() -> void:
+	var player := _get_player()
+	if player == null:
+		return
+	# Drop in ~120px behind the player along their facing.
+	var offset: Vector2 = Vector2(0, 1).rotated(randf() * TAU) * 140.0
+	global_position = player.global_position + offset
 
 func _resolve_pattern() -> void:
 	var player := _get_player()
@@ -154,6 +172,8 @@ func _do_projectile_fan() -> void:
 		p.set("owner_group", "boss")
 		p.set("damage", projectile_damage)
 		p.set("speed", 420.0)
+		if cheat_pierces_iframes and "pierces_iframes" in p:
+			p.set("pierces_iframes", true)
 		get_parent().add_child(p)
 
 func _advance_slam(delta: float) -> void:
@@ -195,11 +215,37 @@ func _pattern_name(p: int) -> String:
 func take_damage(amount: int) -> void:
 	if _defeated:
 		return
+	# Cheat: god-mode windows reject incoming damage occasionally.
+	if cheat_godmode_chance > 0.0 and randf() < cheat_godmode_chance:
+		wants_to_talk.emit("Nope.")
+		return
 	hp = max(0, hp - amount)
 	hp_changed.emit(hp, max_hp)
+	_update_cheat_title_bar()
 	_check_phase_transition()
 	if hp <= 0:
 		_on_defeat()
+
+func _update_cheat_title_bar() -> void:
+	if not cheat_writes_title_bar:
+		return
+	var pct: int = int(round(100.0 * float(hp) / float(max_hp)))
+	DisplayServer.window_set_title("Boss Battle Belay — boss HP: %d%%" % pct)
+
+func _maybe_write_taunt_to_save(taunt: String) -> void:
+	if not cheat_writes_save_file:
+		return
+	# Append a taunt line to a side file the player can find. Keeping it
+	# off the canonical loop_state.json keeps the schema clean.
+	var path := "user://boss_taunts.log"
+	var f := FileAccess.open(path, FileAccess.READ_WRITE)
+	if f == null:
+		f = FileAccess.open(path, FileAccess.WRITE)
+		if f == null:
+			return
+	f.seek_end()
+	f.store_line("[%s] %s" % [Time.get_datetime_string_from_system(true), taunt])
+	f.close()
 
 func _check_phase_transition() -> void:
 	var ratio: float = float(hp) / float(max_hp)
@@ -214,7 +260,9 @@ func _enter_phase(phase: int) -> void:
 	_pattern_timer = 1.0
 	_pattern = Pattern.IDLE
 	_telegraph_timer = 0.0
-	wants_to_talk.emit(_phase_taunt(phase))
+	var taunt: String = _phase_taunt(phase)
+	wants_to_talk.emit(taunt)
+	_maybe_write_taunt_to_save(taunt)
 	if triggers_clash_on_phase_transition and phase >= Phase.TWO:
 		call_deferred("_initiate_phase_clash")
 

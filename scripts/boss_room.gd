@@ -75,6 +75,14 @@ func _apply_boss_config_to_boss() -> void:
 	if "triggers_clash_on_phase_transition" in _boss:
 		_boss.set("triggers_clash_on_phase_transition",
 			bool(_boss_config.get("triggers_clash_on_phase_transition", false)))
+	# F4 cheat flags. Each is independently optional; missing keys leave
+	# the export defaults (all-off) in place.
+	var cheats: Dictionary = _boss_config.get("cheats", {})
+	for cheat_key in ["skip_telegraph", "pierces_iframes", "godmode_chance",
+			"teleport_chance", "writes_title_bar", "writes_save_file"]:
+		var prop: String = "cheat_" + cheat_key
+		if prop in _boss and cheats.has(cheat_key):
+			_boss.set(prop, cheats[cheat_key])
 	# Sprite tint per floor.
 	var color_arr: Array = _boss_config.get("sprite_color", [])
 	if color_arr.size() == 4 and _boss.has_node("Sprite"):
@@ -120,17 +128,23 @@ func _wire_active_hero_player() -> void:
 func _on_boss_talk(line: String) -> void:
 	_dialogue_box.show_line(_interp(line), 3.5)
 
-# Hero-side WIN: the boss has been beaten. Trigger boss-side play instead
-# of immediately ending the run.
+# Hero-side WIN: the boss has been beaten. Trigger boss-side play
+# (or skip it on the final boss) and emit run-win when appropriate.
 func _on_hero_side_boss_defeated() -> void:
 	if BossSwap.current_state != BossSwap.SwapState.HERO:
 		# Stray fire — shouldn't happen since the boss is disabled during
 		# boss-side. Safe to ignore.
 		return
-	# Show the reveal dialog before kicking off the swap announcement.
+	# Show the reveal dialog before kicking off the next beat.
 	var line: String = _config_dialog("reveal_on_defeat")
 	if line != "":
 		_dialogue_box.show_line(_interp(line), 3.0)
+	if bool(_boss_config.get("skip_boss_side", false)):
+		# F4: no boss-side play. Run-win triggers as soon as the reveal
+		# dialog has had a moment to land.
+		await get_tree().create_timer(3.0).timeout
+		boss_defeated.emit()
+		return
 	BossSwap.request_swap(boss_id)
 
 func _on_player_died() -> void:

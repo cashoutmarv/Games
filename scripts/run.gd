@@ -3,12 +3,13 @@ extends Node
 const ArenaScene := preload("res://scenes/arena.tscn")
 const BossRoomScene := preload("res://scenes/boss_room.tscn")
 const DesktopHubScene := preload("res://scenes/desktop_hub.tscn")
+const EndingTrueScene := preload("res://scenes/endings/ending_true.tscn")
 const PlayerScene := preload("res://scenes/actors/player.tscn")
 
 const RUN_DURATION_SECONDS := 600.0  # 10 minutes
 const ARENA_PLAYER_SPAWN := Vector2(540, 1500)
 const BOSS_ROOM_PLAYER_SPAWN := Vector2(540, 1500)
-const FINAL_FLOOR: int = 3
+const FINAL_FLOOR: int = 4
 
 @onready var _stage: Node = $Stage
 @onready var _hud: CanvasLayer = $HUD
@@ -60,8 +61,14 @@ func _enter_boss_room() -> void:
 		_arena = null
 	_boss_room = BossRoomScene.instantiate()
 	# Set boss_id from current floor BEFORE adding to tree so _ready picks
-	# the right config.
-	_boss_room.set("boss_id", "boss_floor_%d" % RunState.current_floor)
+	# the right config. The final floor uses "boss_final" rather than
+	# "boss_floor_4" to match the GDD's framing.
+	var boss_id: String
+	if RunState.current_floor >= FINAL_FLOOR:
+		boss_id = "boss_final"
+	else:
+		boss_id = "boss_floor_%d" % RunState.current_floor
+	_boss_room.set("boss_id", boss_id)
 	_stage.add_child(_boss_room)
 	# Move the existing player into the new room and reposition.
 	if _player != null and is_instance_valid(_player):
@@ -116,10 +123,14 @@ func _format_time(seconds: float) -> String:
 	return "%02d:%02d" % [m, s]
 
 func _on_boss_defeated() -> void:
-	# Floor cleared (boss-side play has resolved). Advance to next floor
-	# or end the run as a win on the final floor.
+	# Floor cleared. F1–F3 do boss-side then advance; F4 (final) skips
+	# boss-side and runs the ending instead.
 	if RunState.current_floor >= FINAL_FLOOR:
-		_finish(true)
+		EndingDirector.mark_true_ending_complete()
+		RunState.end_run(true)
+		# Reset cosmetic title bar before leaving the run.
+		DisplayServer.window_set_title("Boss Battle Belay")
+		get_tree().change_scene_to_packed(EndingTrueScene)
 		return
 	RunState.current_floor += 1
 	_advance_to_next_floor()

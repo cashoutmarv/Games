@@ -367,10 +367,12 @@ func _update_visuals(_delta: float) -> void:
 	else:
 		_sprite.color = Color(0.4, 0.8, 1.0, 1)
 
-func take_damage(amount: int) -> void:
-	if _is_dodging or _iframes_timer > 0.0:
+func take_damage(amount: int, pierces_iframes: bool = false) -> void:
+	# Cheat projectiles (F4) bypass dodge/parry invuln. Everything else
+	# honors the normal i-frame window.
+	if not pierces_iframes and (_is_dodging or _iframes_timer > 0.0):
 		return
-	if _parry_timer > 0.0:
+	if not pierces_iframes and _parry_timer > 0.0:
 		# Successful parry — incoming damage is rejected and the parry window
 		# closes. Projectile reflection happens in projectile.gd's collision
 		# logic (it queries player.is_parrying()).
@@ -381,9 +383,10 @@ func take_damage(amount: int) -> void:
 				and not ClashDirector.is_clash_active():
 			_clash_after_parry()
 		return
-	# F3 perk: body-reflex auto-dodge if cooldown is ready.
-	if BossSwap.has_ability("prediction_reflex") and _reflex_cooldown <= 0.0 \
-			and not is_boss_side:
+	# F3 perk: body-reflex auto-dodge if cooldown is ready. F4 piercing
+	# damage bypasses this too.
+	if not pierces_iframes and BossSwap.has_ability("prediction_reflex") \
+			and _reflex_cooldown <= 0.0 and not is_boss_side:
 		_reflex_cooldown = _REFLEX_COOLDOWN_SECONDS
 		_iframes_timer = _REFLEX_IFRAMES
 		AudioBus.play_sfx("player_dodge")

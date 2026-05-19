@@ -5,6 +5,8 @@ extends Area2D
 @export var lifetime: float = 1.5
 @export var reflect_speed_multiplier: float = 1.3
 @export var reflect_damage_multiplier: float = 1.5
+# F4 cheat flag — projectile ignores the player's dodge/parry i-frames.
+@export var pierces_iframes: bool = false
 
 var direction: Vector2 = Vector2.RIGHT
 var owner_group: String = "player"  # "player" or "boss" — controls who it can hit
@@ -42,13 +44,21 @@ func _try_hit(node: Node) -> void:
 		hit_groups = ["player", "hero_ai"]
 	for g in hit_groups:
 		if node.is_in_group(g):
-			# Parry-reflection: if this is a boss projectile hitting a parrying
-			# player, swap owners and bounce it back instead of damaging.
-			if owner_group == "boss" and g == "player" and node.has_method("is_parrying") and node.is_parrying():
+			# Parry-reflection: if this is a (non-piercing) boss projectile
+			# hitting a parrying player, swap owners and bounce it back
+			# instead of damaging. F4 cheat projectiles ignore the parry.
+			if not pierces_iframes and owner_group == "boss" and g == "player" \
+					and node.has_method("is_parrying") and node.is_parrying():
 				_reflect()
 				return
 			if node.has_method("take_damage"):
-				node.take_damage(damage)
+				# Player.take_damage takes an optional pierces_iframes
+				# argument; other actors take only the amount. Pass it
+				# through only for the player.
+				if pierces_iframes and node.is_in_group("player"):
+					node.take_damage(damage, true)
+				else:
+					node.take_damage(damage)
 				_apply_dot_if_tagged(node)
 			if _chain_if_tagged(node):
 				return
