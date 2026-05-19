@@ -34,6 +34,9 @@ func _default_state() -> Dictionary:
 		"endings_seen": [],
 		"ending_one_completed_at_iso": "",
 		"choices_seen": [],
+		"reveals_unlocked": [],
+		"bosses_defeated": [],
+		"first_rewind_seen": false,
 	}
 
 func load_state() -> void:

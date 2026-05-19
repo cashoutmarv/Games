@@ -1,8 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://bbbhud000000"]
+[gd_scene load_steps=3 format=3 uid="uid://bbbhud000000"]
 
 [ext_resource type="Script" path="res://scripts/ui/virtual_joystick.gd" id="1_js"]
+[ext_resource type="Script" path="res://scripts/hud.gd" id="2_hud"]
 
 [node name="HUD" type="CanvasLayer"]
+script = ExtResource("2_hud")
 
 [node name="HPBar" type="ProgressBar" parent="."]
 offset_left = 16.0

@@ -9,6 +9,9 @@ signal run_ended(won: bool)
 var current_phase: int = PhaseMachine.NarrativePhase.NORMAL_FIGHT
 var run_in_progress: bool = false
 var reached_boss_room_this_run: bool = false
+# Per-run bonus damage applied on top of weapon/projectile base damage.
+# Earned by dying boss-side then winning back; resets to 0 at run start.
+var damage_bonus: int = 0
 
 func _ready() -> void:
 	recompute_phase()
@@ -26,6 +29,7 @@ func recompute_phase() -> void:
 func start_run() -> void:
 	run_in_progress = true
 	reached_boss_room_this_run = false
+	damage_bonus = 0
 	recompute_phase()
 	ReplayRecorder.start()
 	run_started.emit()

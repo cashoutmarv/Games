@@ -3,8 +3,11 @@ extends Node
 const ArenaScene := preload("res://scenes/arena.tscn")
 const BossRoomScene := preload("res://scenes/boss_room.tscn")
 const MainMenuScene := preload("res://scenes/main_menu.tscn")
+const PlayerScene := preload("res://scenes/actors/player.tscn")
 
 const RUN_DURATION_SECONDS := 600.0  # 10 minutes
+const ARENA_PLAYER_SPAWN := Vector2(540, 1500)
+const BOSS_ROOM_PLAYER_SPAWN := Vector2(540, 1500)
 
 @onready var _stage: Node = $Stage
 @onready var _hud: CanvasLayer = $HUD
@@ -12,11 +15,21 @@ const RUN_DURATION_SECONDS := 600.0  # 10 minutes
 
 var _arena: Node = null
 var _boss_room: Node = null
+var _player: Node = null
 var _time_left: float = RUN_DURATION_SECONDS
 
 func _ready() -> void:
 	RunState.start_run()
+	_spawn_player(ARENA_PLAYER_SPAWN)
 	_load_arena()
+
+func _spawn_player(at: Vector2) -> void:
+	_player = PlayerScene.instantiate()
+	_stage.add_child(_player)
+	_player.global_position = at
+	if _player.has_signal("died") and not _player.is_connected("died", _on_player_died):
+		_player.connect("died", _on_player_died)
+	_wire_joystick_to(_player)
 
 func _load_arena() -> void:
 	if _arena != null:
@@ -25,7 +38,6 @@ func _load_arena() -> void:
 	_stage.add_child(_arena)
 	if _arena.has_signal("exit_to_boss"):
 		_arena.connect("exit_to_boss", _enter_boss_room)
-	_wire_player()
 
 func _enter_boss_room() -> void:
 	if _arena != null:
@@ -33,25 +45,39 @@ func _enter_boss_room() -> void:
 		_arena = null
 	_boss_room = BossRoomScene.instantiate()
 	_stage.add_child(_boss_room)
+	# Move the existing player into the new room and reposition.
+	if _player != null and is_instance_valid(_player):
+		_player.get_parent().remove_child(_player)
+		_boss_room.add_child(_player)
+		_player.global_position = BOSS_ROOM_PLAYER_SPAWN
 	RunState.mark_reached_boss_room()
 	if _boss_room.has_signal("boss_defeated"):
 		_boss_room.connect("boss_defeated", _on_boss_defeated)
 	if _boss_room.has_signal("player_died"):
 		_boss_room.connect("player_died", _on_player_died)
-	_wire_player()
+	if _boss_room.has_signal("player_respawned"):
+		_boss_room.connect("player_respawned", _on_player_respawned)
 
-func _wire_player() -> void:
-	# Hook the HUD's joystick to whatever player exists in the current stage.
-	var players := get_tree().get_nodes_in_group("player")
-	if players.is_empty():
+func _wire_joystick_to(player: Node) -> void:
+	if not is_instance_valid(player):
 		return
-	var player: Node = players[0]
 	if _hud.has_node("Joystick"):
 		var js: Node = _hud.get_node("Joystick")
-		if not js.is_connected("steer_changed", Callable(player, "set_steer")):
-			js.connect("steer_changed", Callable(player, "set_steer"))
-	if player.has_signal("died") and not player.is_connected("died", _on_player_died):
-		player.connect("died", _on_player_died)
+		var cb := Callable(player, "set_steer")
+		if not js.is_connected("steer_changed", cb):
+			js.connect("steer_changed", cb)
+	if _hud.has_method("bind_player"):
+		_hud.bind_player(player)
+
+func _on_player_respawned(player: Node) -> void:
+	_player = player
+	# Boss-side player deaths are handled inside the boss room (they feed
+	# the boss-side death counter and don't end the run by themselves), so
+	# don't wire run's run-ending `died` handler in that case.
+	if not bool(player.get("is_boss_side")):
+		if player.has_signal("died") and not player.is_connected("died", _on_player_died):
+			player.connect("died", _on_player_died)
+	_wire_joystick_to(player)
 
 func _process(delta: float) -> void:
 	if not RunState.run_in_progress:
@@ -73,5 +99,7 @@ func _on_player_died() -> void:
 	_finish(false)
 
 func _finish(won: bool) -> void:
+	if not RunState.run_in_progress:
+		return
 	RunState.end_run(won)
 	get_tree().change_scene_to_packed(MainMenuScene)

@@ -1,0 +1,34 @@
+{
+	"boss_floor_1": {
+		"id": "boss_floor_1",
+		"display_name": "The Tenant",
+		"floor": 1,
+		"hero_side": {
+			"max_hp": 480,
+			"phase_thresholds": [0.66, 0.33],
+			"contact_damage": 12,
+			"projectile_damage": 8,
+			"dash_damage": 18,
+			"slam_damage": 22,
+			"move_speed": 110.0,
+			"telegraph_seconds": 0.7
+		},
+		"boss_side": {
+			"max_hp": 600,
+			"max_deaths_before_run_ends": 3,
+			"hero_ai_wave": [
+				{"hp": 60, "speed": 130.0, "damage": 8, "count": 1},
+				{"hp": 60, "speed": 130.0, "damage": 8, "count": 2},
+				{"hp": 60, "speed": 130.0, "damage": 8, "count": 3}
+			]
+		},
+		"inherited_ability": "rewind_on_death",
+		"reveal_on_defeat": "hidden_depth",
+		"dialogue": {
+			"intro": "You came in swinging. Cute. Try and parry me — bet you forgot you could.",
+			"reveal_on_defeat": "Every hit had a window. Every dodge could cancel. You knew none of it. Take this — and try again.",
+			"boss_side_intro": "Now you're me. Watch them come for you the way you came for me.",
+			"boss_side_win": "You felt it. Time bends when you matter enough. Bring that back."
+		}
+	}
+}
