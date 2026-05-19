@@ -1,0 +1,33 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbbswp000000"]
+
+[ext_resource type="Script" path="res://scripts/ui/swap_announcement.gd" id="1_swap"]
+
+[node name="SwapAnnouncement" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_swap")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.88)
+
+[node name="Center" type="CenterContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBox" type="VBoxContainer" parent="Center"]
+custom_minimum_size = Vector2(600, 0)
+theme_override_constants/separation = 24
+
+[node name="Title" type="Label" parent="Center/VBox"]
+text = "YOUR TURN."
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 48
+
+[node name="Body" type="Label" parent="Center/VBox"]
+text = "Take the boss seat."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Continue" type="Button" parent="Center/VBox"]
+text = "Continue"

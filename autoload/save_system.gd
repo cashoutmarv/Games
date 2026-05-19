@@ -3,7 +3,7 @@ extends Node
 const SAVE_PATH := "user://loop_state.json"
 const BOSS_PATH := "user://boss.dat"
 const REPLAY_PATH := "user://run1_inputs.dat"
-const SCHEMA_VERSION := 1
+const SCHEMA_VERSION := 2
 const BOSS_SIGNATURE := "I am the warden of the loop."
 
 signal state_changed
@@ -27,6 +27,13 @@ func _default_state() -> Dictionary:
 		"first_run_recorded": false,
 		"recorded_inputs_path": REPLAY_PATH,
 		"last_played_iso": Time.get_datetime_string_from_system(true),
+		# --- v2 additions (role-swap + endings + choice screens) ---
+		"inherited_abilities": [],
+		"boss_side_deaths_total": 0,
+		"first_boss_side_swap_seen": false,
+		"endings_seen": [],
+		"ending_one_completed_at_iso": "",
+		"choices_seen": [],
 	}
 
 func load_state() -> void:
@@ -48,6 +55,7 @@ func load_state() -> void:
 		save()
 		return
 	state = _merge_with_defaults(parsed)
+	_migrate_if_needed()
 	_detect_tampering()
 
 func _merge_with_defaults(parsed: Dictionary) -> Dictionary:
@@ -56,6 +64,19 @@ func _merge_with_defaults(parsed: Dictionary) -> Dictionary:
 		if merged.has(key):
 			merged[key] = parsed[key]
 	return merged
+
+# Walks the loaded state forward to the current SCHEMA_VERSION. Each step
+# touches only fields it owns, so a v1-on-disk save lights up the v2 fields
+# without losing v1 progress.
+func _migrate_if_needed() -> void:
+	var loaded_version: int = int(state.get("schema_version", 1))
+	if loaded_version >= SCHEMA_VERSION:
+		return
+	if loaded_version < 2:
+		# v1 saves don't have these fields; defaults already filled them in
+		# via _merge_with_defaults, but persist the bumped schema version.
+		state.schema_version = 2
+	save()
 
 func _detect_tampering() -> void:
 	# If boss.dat is missing but state says not deleted, treat as user-tampered.
@@ -135,6 +156,22 @@ func set_role_swap(active: bool) -> void:
 func set_first_run_recorded() -> void:
 	state.first_run_recorded = true
 	save()
+
+func mark_ending_seen(ending_id: String) -> void:
+	var seen: Array = state.get("endings_seen", [])
+	if not seen.has(ending_id):
+		seen.append(ending_id)
+		state.endings_seen = seen
+		if ending_id == "true" and state.get("ending_one_completed_at_iso", "") == "":
+			state.ending_one_completed_at_iso = Time.get_datetime_string_from_system(true)
+		save()
+
+func mark_choice_outcome_seen(choice_outcome_id: String) -> void:
+	var seen: Array = state.get("choices_seen", [])
+	if not seen.has(choice_outcome_id):
+		seen.append(choice_outcome_id)
+		state.choices_seen = seen
+		save()
 
 func reset_all() -> void:
 	# Dev cheat — wipe everything and recreate.

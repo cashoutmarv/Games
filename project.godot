@@ -24,6 +24,7 @@ SaveSystem="*res://autoload/save_system.gd"
 DialogueDirector="*res://autoload/dialogue_director.gd"
 ReplayRecorder="*res://autoload/replay_recorder.gd"
 AudioBus="*res://autoload/audio_bus.gd"
+BossSwap="*res://autoload/boss_swap.gd"
 
 [display]
 

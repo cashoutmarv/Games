@@ -5,12 +5,20 @@ const ProjectileScene := preload("res://scenes/actors/projectile.tscn")
 
 signal hp_changed(hp: int, max_hp: int)
 signal died
+# Emitted when a death is intercepted by the role-swap flow instead of ending
+# the run. The player node stays alive for the swap announcement; the boss
+# room owns the actual hand-off into boss-side play.
+signal death_intercepted_by_swap(boss_id: String)
 
 @export var max_hp: int = 100
 @export var move_speed: float = 200.0
 @export var fire_cadence: float = 0.5
 @export var fire_range: float = 400.0
 @export var is_replay: bool = false
+# Set by the boss room before the fight starts so player.gd can ask BossSwap
+# to handle death routing. Empty string means "no boss context" — death falls
+# through to the original `died` + queue_free path.
+@export var swap_boss_id: String = ""
 
 var hp: int = max_hp
 var steer_input: Vector2 = Vector2.ZERO
@@ -85,5 +93,13 @@ func take_damage(amount: int) -> void:
 	hp = max(0, hp - amount)
 	hp_changed.emit(hp, max_hp)
 	if hp <= 0:
+		if swap_boss_id != "" and BossSwap.current_state == BossSwap.SwapState.HERO:
+			# Boss-fight death: route through role-swap. The hero node is
+			# done; the boss room takes over via BossSwap signals and will
+			# spawn whatever it needs for boss-side play.
+			death_intercepted_by_swap.emit(swap_boss_id)
+			BossSwap.request_swap(swap_boss_id)
+			queue_free()
+			return
 		died.emit()
 		queue_free()

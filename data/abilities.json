@@ -1,0 +1,45 @@
+{
+	"rewind_on_death": {
+		"id": "rewind_on_death",
+		"label": "Time-Rewind on Death",
+		"from_boss": "boss_floor_1",
+		"description": "When you die, time rewinds about two seconds and you continue. The first time you ever earn this in a fight, a cinematic plays; after that, only a brief flourish accompanies each rewind.",
+		"rewind_seconds": 2.0,
+		"snapshot_interval_seconds": 0.25,
+		"flourish_duration_seconds": 0.4,
+		"first_cinematic_duration_seconds": 5.0,
+		"modifier_hooks": [
+			"rewind_extra_charges",
+			"rewind_longer_window",
+			"rewind_partial_state",
+			"rewind_visual_style"
+		]
+	},
+	"clash_trigger": {
+		"id": "clash_trigger",
+		"label": "Force the Clash",
+		"from_boss": "boss_floor_2",
+		"description": "Clashes automatically fire on clean parries and equal-strength collisions. Spend a resource to force a clash from a neutral moment, freezing both fighters and presenting a choice.",
+		"force_cost": 1,
+		"auto_clash_on_parry": true,
+		"auto_clash_on_equal_collision": true,
+		"modifier_hooks": [
+			"clash_cheaper",
+			"clash_extra_option",
+			"clash_reveal_opponent_pick"
+		]
+	},
+	"prediction_reflex": {
+		"id": "prediction_reflex",
+		"label": "Read & Reflex",
+		"from_boss": "boss_floor_3",
+		"description": "Ghost arrows show the next one or two optimal moves through the boss's attack patterns. When you would take a hit and a recent prediction would have moved you clear, your character auto-dodges.",
+		"lookahead_steps": 2,
+		"auto_dodge_cooldown_seconds": 3.0,
+		"modifier_hooks": [
+			"prediction_extra_lookahead",
+			"reflex_lower_cooldown",
+			"reflex_double_proc"
+		]
+	}
+}
