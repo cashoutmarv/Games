@@ -8,7 +8,9 @@ extends Area2D
 
 var direction: Vector2 = Vector2.RIGHT
 var owner_group: String = "player"  # "player" or "boss" — controls who it can hit
+var tags: Array = []  # weapon tags applied on hit: "dot", "chain", ...
 var _reflected: bool = false
+var _chained_once: bool = false
 
 var _age: float = 0.0
 
@@ -47,6 +49,9 @@ func _try_hit(node: Node) -> void:
 				return
 			if node.has_method("take_damage"):
 				node.take_damage(damage)
+				_apply_dot_if_tagged(node)
+			if _chain_if_tagged(node):
+				return
 			queue_free()
 			return
 
@@ -60,3 +65,45 @@ func _reflect() -> void:
 	damage = int(damage * reflect_damage_multiplier)
 	# Briefly extend lifetime so the reflected shot has time to travel back.
 	lifetime = max(lifetime, _age + 1.5)
+
+# "dot" tag: apply ~3 ticks of secondary damage after the initial hit.
+func _apply_dot_if_tagged(node: Node) -> void:
+	if not tags.has("dot"):
+		return
+	if not node.has_method("take_damage"):
+		return
+	var ticks: int = 3
+	var dmg_per_tick: int = max(1, int(damage * 0.2))
+	var t: SceneTreeTimer
+	for i in ticks:
+		t = node.get_tree().create_timer(0.4 * float(i + 1))
+		t.timeout.connect(func():
+			if is_instance_valid(node) and node.has_method("take_damage"):
+				node.take_damage(dmg_per_tick)
+		)
+
+# "chain" tag: after the first hit, the projectile re-targets the nearest
+# other enemy (one chain only) and continues with reduced damage.
+func _chain_if_tagged(node: Node) -> bool:
+	if not tags.has("chain"):
+		return false
+	if _chained_once:
+		return false
+	_chained_once = true
+	var seek_groups: Array = ["enemy", "boss"] if owner_group == "player" else ["player", "hero_ai"]
+	var nearest: Node2D = null
+	var nearest_d: float = INF
+	for g in seek_groups:
+		for n in get_tree().get_nodes_in_group(g):
+			if n == node or not (n is Node2D):
+				continue
+			var d: float = (n as Node2D).global_position.distance_to(global_position)
+			if d < nearest_d:
+				nearest_d = d
+				nearest = n as Node2D
+	if nearest == null:
+		return false
+	direction = (nearest.global_position - global_position).normalized()
+	damage = int(damage * 0.7)
+	lifetime = _age + 1.0
+	return true

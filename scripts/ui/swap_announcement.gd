@@ -12,11 +12,11 @@ signal acknowledged
 @onready var _button: Button = $Center/VBox/Continue
 
 const _SWAP_FIRST_TITLE := "YOUR TURN."
-const _SWAP_FIRST_BODY := "You died. Take the boss seat — finish the fight from the other side. Win to bring back the boss's power."
+const _SWAP_FIRST_BODY := "You beat them. Now take the seat and hold the line — the next hero is on the way. Each death here sharpens you."
 const _SWAP_REPEAT_TITLE := "AGAIN."
-const _SWAP_REPEAT_BODY := "You died. Take the boss seat. Each death sharpens what you bring back."
-const _RETURN_TITLE := "BACK TO YOU."
-const _RETURN_BODY_FMT := "You won as the boss. You return with: %s.\nDamage bonus this run: +%d."
+const _SWAP_REPEAT_BODY := "You beat them. Take the seat. Defend the doorway long enough to walk through it."
+const _ONWARD_TITLE := "ONWARD."
+const _ONWARD_BODY_FMT := "You held. You carry forward: %s.\nDamage bonus this run: +%d."
 
 func _ready() -> void:
 	_button.pressed.connect(_on_continue)
@@ -32,11 +32,11 @@ func show_for_swap(is_first_ever: bool) -> void:
 	_button.text = "Continue"
 	_button.grab_focus()
 
-# Configure the overlay for the "boss-side won → return to hero" beat.
-func show_for_return(ability_label: String, bonus_damage: int) -> void:
-	_title.text = _RETURN_TITLE
-	_body.text = _RETURN_BODY_FMT % [ability_label, bonus_damage]
-	_button.text = "Return"
+# Configure the overlay for the "boss-side cleared → advance to next floor" beat.
+func show_for_onward(ability_label: String, bonus_damage: int) -> void:
+	_title.text = _ONWARD_TITLE
+	_body.text = _ONWARD_BODY_FMT % [ability_label, bonus_damage]
+	_button.text = "Continue"
 	_button.grab_focus()
 
 func _on_continue() -> void:

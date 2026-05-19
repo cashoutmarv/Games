@@ -26,6 +26,8 @@ ReplayRecorder="*res://autoload/replay_recorder.gd"
 AudioBus="*res://autoload/audio_bus.gd"
 BossSwap="*res://autoload/boss_swap.gd"
 RevealDirector="*res://autoload/reveal_director.gd"
+WeaponDict="*res://autoload/weapon_dict.gd"
+ChoiceDirector="*res://autoload/choice_director.gd"
 
 [display]
 

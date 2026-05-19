@@ -1,0 +1,85 @@
+{
+	"screens": {
+		"weapon_prompt": {
+			"title": "WHAT DID YOU BRING?",
+			"subtitle": "You can pick from the suggestions or write your own.",
+			"options": [
+				{
+					"label": "SWORD",
+					"outcome_id": "weapon_prompt_sword_fail",
+					"is_advance": false,
+					"fail_line": "The blade shatters on a coffee table on your way in. Try again."
+				},
+				{
+					"label": "BOOK",
+					"outcome_id": "weapon_prompt_book_fail",
+					"is_advance": false,
+					"fail_line": "You can barely lift it. The corners hurt your fingers more than they hurt anyone else. Try again."
+				},
+				{
+					"label": "COFFEE MUG",
+					"outcome_id": "weapon_prompt_mug_fail",
+					"is_advance": false,
+					"fail_line": "Hot. It is so hot. You're the one taking damage. Try again."
+				},
+				{
+					"label": "CUSTOM →",
+					"outcome_id": "weapon_prompt_custom_advance",
+					"is_advance": true
+				}
+			]
+		},
+		"door_floor_1": {
+			"title": "THE DOOR.",
+			"subtitle": "The Tenant is on the other side. They sound annoyed.",
+			"options": [
+				{
+					"label": "KICK DOWN",
+					"outcome_id": "door_f1_kick_fail",
+					"is_advance": false,
+					"fail_line": "The door opens outward. You bounce. Embarrassing."
+				},
+				{
+					"label": "KNOCK POLITELY",
+					"outcome_id": "door_f1_knock_fail",
+					"is_advance": false,
+					"fail_line": "From inside: \"Go away. I'm watching my show.\""
+				},
+				{
+					"label": "FOOL!",
+					"outcome_id": "door_f1_fool_fail",
+					"is_advance": false,
+					"fail_line": "Nothing happens. You said it out loud. Why did you say it out loud."
+				},
+				{
+					"label": "WALK IN",
+					"outcome_id": "door_f1_walk_advance",
+					"is_advance": true
+				}
+			]
+		},
+		"fridge_f1": {
+			"title": "THE FRIDGE.",
+			"subtitle": "It hums at you suggestively.",
+			"options": [
+				{
+					"label": "OPEN IT",
+					"outcome_id": "fridge_f1_open_fail",
+					"is_advance": false,
+					"fail_line": "Just leftovers. Some of them blink."
+				},
+				{
+					"label": "KICK IT",
+					"outcome_id": "fridge_f1_kick_fail",
+					"is_advance": false,
+					"fail_line": "Your toe regrets this. The fridge does not."
+				},
+				{
+					"label": "WALK AWAY",
+					"outcome_id": "fridge_f1_leave_advance",
+					"is_advance": true
+				}
+			]
+		}
+	}
+}

@@ -37,6 +37,8 @@ func _default_state() -> Dictionary:
 		"reveals_unlocked": [],
 		"bosses_defeated": [],
 		"first_rewind_seen": false,
+		"last_weapon_text": "",
+		"last_weapon_archetype": "",
 	}
 
 func load_state() -> void:

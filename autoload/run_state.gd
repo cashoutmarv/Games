@@ -12,6 +12,10 @@ var reached_boss_room_this_run: bool = false
 # Per-run bonus damage applied on top of weapon/projectile base damage.
 # Earned by dying boss-side then winning back; resets to 0 at run start.
 var damage_bonus: int = 0
+# Player-typed weapon for this run + the resolved dictionary entry.
+# Set by weapon_input.gd via set_weapon() before the arena loads.
+var weapon_text: String = ""
+var weapon_data: Dictionary = {}
 
 func _ready() -> void:
 	recompute_phase()
@@ -33,6 +37,19 @@ func start_run() -> void:
 	recompute_phase()
 	ReplayRecorder.start()
 	run_started.emit()
+
+# Record the weapon the player chose at run start. Called from weapon_input.gd.
+func set_weapon(text: String, resolved: Dictionary) -> void:
+	weapon_text = text
+	weapon_data = resolved
+	# Persist a hint for the desktop hub to display "last run's weapon".
+	SaveSystem.state.last_weapon_text = text
+	SaveSystem.state.last_weapon_archetype = String(resolved.get("archetype", ""))
+	SaveSystem.save()
+
+func clear_weapon() -> void:
+	weapon_text = ""
+	weapon_data = {}
 
 func mark_reached_boss_room() -> void:
 	reached_boss_room_this_run = true

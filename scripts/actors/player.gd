@@ -12,9 +12,6 @@ const ProjectileScene := preload("res://scenes/actors/projectile.tscn")
 
 signal hp_changed(hp: int, max_hp: int)
 signal died
-# Emitted when a boss-fight death is routed through BossSwap instead of
-# ending the run. The boss room owns what happens next.
-signal death_intercepted_by_swap(boss_id: String)
 # Emitted when the time-rewind ability triggers on a would-be death.
 # The boss room shows the cinematic (first ever) or a brief flourish.
 signal rewound(is_first_ever: bool)
@@ -33,12 +30,9 @@ signal rewound(is_first_ever: bool)
 @export var fire_range: float = 700.0  # unused now; kept for replay compat
 @export var is_replay: bool = false
 @export var is_boss_side: bool = false
-# Set by the boss room before the fight starts so player.gd can ask BossSwap
-# to handle death routing. Empty string means "no boss context" — death falls
-# through to the original `died` + queue_free path.
-@export var swap_boss_id: String = ""
-# Per-fight bonus damage added on top of weapon-base damage (boss-side win
-# rewards). Boss room sets this when respawning the hero after a swap win.
+# Per-run bonus damage added on top of weapon-base damage. Pulled from
+# RunState.damage_bonus on spawn so respawning boss-side players inherit
+# the accumulating +1-per-death bonus.
 @export var bonus_damage: int = 0
 
 var hp: int = max_hp
@@ -58,7 +52,7 @@ var _hit_flash_timer: float = 0.0
 var _rewind_used_this_fight: bool = false
 var _rewind_snapshots: Array = []
 const _SNAPSHOT_INTERVAL: float = 0.25
-const _SNAPSHOT_BUFFER: int = 10  # 2.5s back at 0.25s spacing
+const _SNAPSHOT_BUFFER: int = 40  # 10s back at 0.25s spacing (F1 perk window)
 var _snapshot_timer: float = 0.0
 var _replay_frames: Array = []
 var _replay_index: int = 0
@@ -74,10 +68,33 @@ func _ready() -> void:
 		max_hp = 600
 		_sprite.color = Color(0.9, 0.2, 0.6, 1)
 		scale = Vector2(2.0, 2.0)
+	# Inherit any run-level bonuses (per-run +1-dmg compounding).
+	if "damage_bonus" in RunState:
+		bonus_damage = max(bonus_damage, int(RunState.damage_bonus))
+	# Apply weapon archetype dispatch (v3). RunState.weapon_data holds the
+	# resolved weapon dictionary entry; defaults are kept if unset.
+	_apply_weapon_dispatch()
 	hp = max_hp
 	hp_changed.emit(hp, max_hp)
 	if is_replay:
 		_replay_frames = ReplayRecorder.load_playback()
+
+func _apply_weapon_dispatch() -> void:
+	if not "weapon_data" in RunState:
+		return
+	var data: Dictionary = RunState.weapon_data
+	if data.is_empty():
+		return
+	var stats: Dictionary = data.get("stats", {})
+	# Each stat is optional; only override the export default if present.
+	if stats.has("fire_cooldown"):
+		fire_cooldown = float(stats["fire_cooldown"])
+	if stats.has("move_speed"):
+		move_speed = float(stats["move_speed"])
+	if stats.has("dodge_speed"):
+		dodge_speed = float(stats["dodge_speed"])
+	# `damage` / `speed` / `range` / `knockback` live on the projectile and
+	# are applied in _spawn_projectile by reading RunState.weapon_data again.
 
 func set_steer(v: Vector2) -> void:
 	steer_input = v.limit_length(1.0)
@@ -218,19 +235,73 @@ func _cancel_charge() -> void:
 	_charge_timer = 0.0
 
 func _spawn_projectile(damage_multiplier: float) -> void:
+	# Dispatch by the resolved weapon's attack_pattern (v3). RunState may
+	# be empty (e.g. test scenes); falls through to single_shot in that case.
+	var pattern: String = "single_shot"
+	if "weapon_data" in RunState:
+		var data: Dictionary = RunState.weapon_data
+		pattern = String(data.get("attack_pattern", "single_shot"))
+	match pattern:
+		"cone": _fire_cone(damage_multiplier)
+		"aoe_radial": _fire_aoe(damage_multiplier)
+		"buff_self": _fire_buff_self()
+		"melee_arc", "thrust": _fire_melee(damage_multiplier, pattern)
+		_: _fire_single(damage_multiplier)
+
+func _fire_single(damage_multiplier: float) -> void:
+	_spawn_one_projectile(aim_direction, damage_multiplier, {})
+
+func _fire_cone(damage_multiplier: float) -> void:
+	# Three projectiles in a 28-degree cone.
+	for offset in [-deg_to_rad(14.0), 0.0, deg_to_rad(14.0)]:
+		_spawn_one_projectile(aim_direction.rotated(offset), damage_multiplier * 0.6, {})
+
+func _fire_aoe(damage_multiplier: float) -> void:
+	# A single slow heavy projectile. (Real AoE explosion in a later phase.)
+	_spawn_one_projectile(aim_direction, damage_multiplier * 1.4, {"speed_mult": 0.6, "size": 1.5})
+
+func _fire_buff_self() -> void:
+	# Utility — no projectile; brief invuln + speed boost.
+	_iframes_timer = max(_iframes_timer, 0.5)
+	# Lean on the dodge boost for the visible "I did something" feedback.
+	_dodge_velocity = aim_direction * dodge_speed * 0.7
+	_is_dodging = true
+	_dodge_timer = 0.18
+
+func _fire_melee(damage_multiplier: float, pattern: String) -> void:
+	# Short-lived close-range projectile that swings forward as a melee hit.
+	var range_mult: float = 0.35 if pattern == "melee_arc" else 0.5
+	_spawn_one_projectile(aim_direction, damage_multiplier * 1.4, {"speed_mult": 0.85, "range_mult": range_mult})
+
+func _spawn_one_projectile(dir: Vector2, damage_multiplier: float, overrides: Dictionary) -> void:
 	var p: Node2D = ProjectileScene.instantiate()
 	# Offset from the firer's body so the projectile cannot self-collide
 	# (boss-side player is in both "player" and "boss" groups).
-	p.global_position = global_position + aim_direction * 36.0
-	p.set("direction", aim_direction)
+	p.global_position = global_position + dir * 36.0
+	p.set("direction", dir)
 	p.set("owner_group", "boss" if is_boss_side else "player")
-	# Base damage is the projectile scene's default; multiplier scales it.
+	# Base damage = weapon damage stat + bonus_damage, scaled by multiplier.
 	var base_dmg: int = int(p.get("damage"))
-	p.set("damage", base_dmg + bonus_damage)
-	if damage_multiplier != 1.0:
-		p.set("damage", int(p.get("damage") * damage_multiplier))
-		# Visually beefier — bigger speed for charged shots.
-		p.set("speed", float(p.get("speed")) * lerp(1.0, 1.4, damage_multiplier / charge_max_multiplier))
+	if "weapon_data" in RunState:
+		var stats: Dictionary = RunState.weapon_data.get("stats", {})
+		if stats.has("damage"):
+			base_dmg = int(stats["damage"])
+		if stats.has("speed"):
+			p.set("speed", float(stats["speed"]))
+		if stats.has("range") and float(p.get("speed")) > 0:
+			p.set("lifetime", float(stats["range"]) / float(p.get("speed")))
+		# Tags surface on the projectile for downstream effects.
+		var tags: Array = RunState.weapon_data.get("tags", [])
+		if "tags" in p:
+			p.set("tags", tags)
+	p.set("damage", int((base_dmg + bonus_damage) * damage_multiplier))
+	if overrides.has("speed_mult"):
+		p.set("speed", float(p.get("speed")) * float(overrides["speed_mult"]))
+	if overrides.has("range_mult") and float(p.get("speed")) > 0:
+		p.set("lifetime", float(p.get("lifetime")) * float(overrides["range_mult"]))
+	# Charged shots get a small extra speed bump for feel.
+	if damage_multiplier > 1.0:
+		p.set("speed", float(p.get("speed")) * lerp(1.0, 1.4, (damage_multiplier - 1.0) / max(0.01, charge_max_multiplier - 1.0)))
 	get_parent().add_child(p)
 
 func _tick_rewind_snapshot(delta: float) -> void:
@@ -273,13 +344,10 @@ func take_damage(amount: int) -> void:
 	_hit_flash_timer = 0.08
 	if hp > 0:
 		return
-	# Death — try rewind first, then swap, then fall through.
+	# Death — try rewind (perk), then fall through. Hero death no longer
+	# routes through BossSwap; that fires on hero-side WIN now (boss_room
+	# triggers BossSwap.request_swap from boss-defeated).
 	if _try_rewind():
-		return
-	if swap_boss_id != "" and BossSwap.current_state == BossSwap.SwapState.HERO:
-		death_intercepted_by_swap.emit(swap_boss_id)
-		BossSwap.request_swap(swap_boss_id)
-		queue_free()
 		return
 	died.emit()
 	queue_free()

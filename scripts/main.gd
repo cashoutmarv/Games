@@ -1,15 +1,13 @@
 extends Node
 
-const PhaseMachine := preload("res://scripts/systems/phase_machine.gd")
-const MainMenuScene := preload("res://scenes/main_menu.tscn")
-const EpilogueScene := preload("res://scenes/epilogue.tscn")
+# Entry-point router. v3 swaps the main menu for the desktop hub.
+# (The v1 role-swap epilogue branch is gone — that narrative was discarded
+# in the v2 pivot.)
+
+const DesktopHubScene := preload("res://scenes/desktop_hub.tscn")
 
 func _ready() -> void:
-	# Route based on whether the player is mid-role-swap.
-	if SaveSystem.state.role_swap_active:
-		_change_scene(EpilogueScene)
-	else:
-		_change_scene(MainMenuScene)
+	_change_scene(DesktopHubScene)
 
 func _change_scene(packed: PackedScene) -> void:
 	var s := packed.instantiate()

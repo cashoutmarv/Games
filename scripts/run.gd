@@ -19,9 +19,21 @@ var _player: Node = null
 var _time_left: float = RUN_DURATION_SECONDS
 
 func _ready() -> void:
+	# Guard: a weapon must be chosen before the arena loads. If the player
+	# entered run.tscn directly without going through weapon_input (e.g.
+	# from a deep link), bounce them to the prompt.
+	if RunState.weapon_data.is_empty():
+		var weapon_scene: PackedScene = load("res://scenes/ui/weapon_input.tscn")
+		call_deferred("_bounce_to_scene", weapon_scene)
+		return
 	RunState.start_run()
-	_spawn_player(ARENA_PLAYER_SPAWN)
+	# Load arena first so the player (added after) renders on top of its
+	# background.
 	_load_arena()
+	_spawn_player(ARENA_PLAYER_SPAWN)
+
+func _bounce_to_scene(packed: PackedScene) -> void:
+	get_tree().change_scene_to_packed(packed)
 
 func _spawn_player(at: Vector2) -> void:
 	_player = PlayerScene.instantiate()

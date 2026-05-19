@@ -1,0 +1,49 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbbwpinp0000"]
+
+[ext_resource type="Script" path="res://scripts/ui/weapon_input.gd" id="1_wpi"]
+
+[node name="WeaponInput" type="Node"]
+script = ExtResource("1_wpi")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Backdrop" type="ColorRect" parent="UI"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.05, 0.05, 0.08, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="UI"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="V" type="VBoxContainer" parent="UI/CenterContainer"]
+custom_minimum_size = Vector2(800, 0)
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="UI/CenterContainer/V"]
+text = "WHAT DID YOU BRING?"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 40
+
+[node name="HintLabel" type="Label" parent="UI/CenterContainer/V"]
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 18
+
+[node name="InputRow" type="HBoxContainer" parent="UI/CenterContainer/V"]
+theme_override_constants/separation = 12
+
+[node name="TextField" type="LineEdit" parent="UI/CenterContainer/V/InputRow"]
+custom_minimum_size = Vector2(600, 56)
+placeholder_text = "rusty crowbar"
+
+[node name="SubmitButton" type="Button" parent="UI/CenterContainer/V/InputRow"]
+custom_minimum_size = Vector2(160, 56)
+text = "GO"
+
+[node name="ResolvedLabel" type="Label" parent="UI/CenterContainer/V"]
+text = ""
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+modulate = Color(0.7, 1.0, 0.7, 1)

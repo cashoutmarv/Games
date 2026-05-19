@@ -25,10 +25,10 @@
 		"inherited_ability": "rewind_on_death",
 		"reveal_on_defeat": "hidden_depth",
 		"dialogue": {
-			"intro": "You came in swinging. Cute. Try and parry me — bet you forgot you could.",
-			"reveal_on_defeat": "Every hit had a window. Every dodge could cancel. You knew none of it. Take this — and try again.",
-			"boss_side_intro": "Now you're me. Watch them come for you the way you came for me.",
-			"boss_side_win": "You felt it. Time bends when you matter enough. Bring that back."
+			"intro": "A {weapon}. Adorable. Try and parry me — bet you forgot you could.",
+			"reveal_on_defeat": "Every hit had a window. Every dodge could cancel. The {weapon} did it anyway. Take this — and try again.",
+			"boss_side_intro": "Now you're me. Watch them come at you the way you came at me.",
+			"boss_side_win": "You felt it. Time bends when you matter enough. Bring that forward."
 		}
 	}
 }

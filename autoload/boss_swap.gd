@@ -85,19 +85,23 @@ func acknowledge_swap_announcement() -> void:
 	boss_side_started.emit(active_boss_id)
 
 # Called by the boss room when the player (now boss-side) dies.
-# This is what powers the cinematic-then-flourish pattern: first death plays
-# the full cinematic, subsequent deaths in the same fight just flourish.
+# Each death grants +1 base damage that compounds for the rest of the run,
+# and the first death uses the cinematic teaching beat for the perk being
+# tested in this boss-side play.
 func notify_boss_side_death() -> void:
 	if current_state != SwapState.BOSS_SIDE:
 		return
 	boss_side_deaths_this_fight += 1
 	SaveSystem.state.boss_side_deaths_total = int(SaveSystem.state.get("boss_side_deaths_total", 0)) + 1
 	SaveSystem.save()
+	# Per-run accumulating damage bonus carried into the next floor.
+	if "damage_bonus" in RunState:
+		RunState.damage_bonus = int(RunState.damage_bonus) + 1
 	boss_side_death_occurred.emit(active_boss_id, boss_side_deaths_this_fight)
 
-# Called by the boss room when the boss-side player has won the fight
-# (KO'd the incoming hero-AI per the floor's win condition).
-# Inherits the boss's signature ability and grants the run a damage bonus.
+# Called by the boss room when boss-side play has been cleared (all incoming
+# hero-AI waves KO'd). Locks in the perk inheritance and announces the
+# transition to the next floor.
 func notify_boss_side_won() -> void:
 	if current_state != SwapState.BOSS_SIDE:
 		return

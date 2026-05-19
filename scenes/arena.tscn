@@ -34,3 +34,10 @@ offset_top = 80.0
 offset_right = 1060.0
 offset_bottom = 132.0
 text = "To Boss"
+
+[node name="FridgeButton" type="Button" parent="UI"]
+offset_left = 80.0
+offset_top = 1000.0
+offset_right = 320.0
+offset_bottom = 1080.0
+text = "[fridge]"

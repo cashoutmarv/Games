@@ -3,6 +3,7 @@ extends CanvasLayer
 @onready var _hp_bar: ProgressBar = $HPBar
 @onready var _joystick: Control = $Joystick
 @onready var _timer_label: Label = $TimerLabel
+@onready var _weapon_label: Label = get_node_or_null("WeaponLabel")
 
 var _bound_player: Node = null
 
@@ -11,6 +12,15 @@ func _ready() -> void:
 	var players := get_tree().get_nodes_in_group("player")
 	if not players.is_empty():
 		bind_player(players[0])
+	_refresh_weapon_label()
+
+func _refresh_weapon_label() -> void:
+	if _weapon_label == null:
+		return
+	if "weapon_text" in RunState and String(RunState.weapon_text) != "":
+		_weapon_label.text = "with: %s" % String(RunState.weapon_text)
+	else:
+		_weapon_label.text = ""
 
 func bind_player(p: Node) -> void:
 	if p == null or not is_instance_valid(p):

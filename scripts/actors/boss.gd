@@ -209,8 +209,8 @@ func _enter_phase(phase: int) -> void:
 
 func _phase_taunt(phase: int) -> String:
 	match phase:
-		Phase.TWO: return "Try harder."
-		Phase.THREE: return "You're getting closer. Almost."
+		Phase.TWO: return "A {weapon}? Try harder."
+		Phase.THREE: return "Almost. The {weapon} isn't going to do it."
 	return ""
 
 func _on_defeat() -> void:
@@ -222,5 +222,5 @@ func _on_defeat() -> void:
 		bd.append(boss_id)
 		SaveSystem.state.bosses_defeated = bd
 		SaveSystem.save()
-	wants_to_talk.emit("Every hit had a window. Every dodge could cancel. You knew none of it.")
+	wants_to_talk.emit("Every hit had a window. Every dodge could cancel. You did it with a {weapon} — but you didn't know any of it.")
 	defeated.emit()

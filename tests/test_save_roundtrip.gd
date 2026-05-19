@@ -56,9 +56,11 @@ func _initialize() -> void:
 		"default schema_version is 2", failures)
 	for required_key in ["inherited_abilities", "boss_side_deaths_total",
 			"first_boss_side_swap_seen", "endings_seen",
-			"ending_one_completed_at_iso", "choices_seen"]:
+			"ending_one_completed_at_iso", "choices_seen",
+			"reveals_unlocked", "bosses_defeated", "first_rewind_seen",
+			"last_weapon_text", "last_weapon_archetype"]:
 		_expect(defaults.has(required_key),
-			"default state has v2 key '%s'" % required_key, failures)
+			"default state has v2+ key '%s'" % required_key, failures)
 
 	# Ending + choice helpers update state idempotently.
 	SaveSystem.state = SaveSystem._default_state()
