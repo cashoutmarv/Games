@@ -1,0 +1,53 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbbclash00000"]
+
+[ext_resource type="Script" path="res://scripts/ui/clash.gd" id="1_cl"]
+
+[node name="Clash" type="CanvasLayer"]
+layer = 25
+script = ExtResource("1_cl")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.9)
+
+[node name="Window" type="CenterContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="V" type="VBoxContainer" parent="Window"]
+custom_minimum_size = Vector2(900, 0)
+theme_override_constants/separation = 28
+
+[node name="Title" type="Label" parent="Window/V"]
+text = "CLASH."
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 48
+
+[node name="Row" type="HBoxContainer" parent="Window/V"]
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Break" type="Button" parent="Window/V/Row"]
+custom_minimum_size = Vector2(260, 200)
+text = "BREAK
+(beats FAKE)"
+theme_override_font_sizes/font_size = 28
+
+[node name="Fake" type="Button" parent="Window/V/Row"]
+custom_minimum_size = Vector2(260, 200)
+text = "FAKE
+(beats COMMIT)"
+theme_override_font_sizes/font_size = 28
+
+[node name="Commit" type="Button" parent="Window/V/Row"]
+custom_minimum_size = Vector2(260, 200)
+text = "COMMIT
+(beats BREAK)"
+theme_override_font_sizes/font_size = 28
+
+[node name="Status" type="Label" parent="Window/V"]
+text = "Both freeze. Pick."
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+modulate = Color(1, 0.92, 0.6, 1)

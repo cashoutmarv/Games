@@ -33,52 +33,57 @@
 			"title": "THE DOOR.",
 			"subtitle": "The Tenant is on the other side. They sound annoyed.",
 			"options": [
-				{
-					"label": "KICK DOWN",
-					"outcome_id": "door_f1_kick_fail",
-					"is_advance": false,
-					"fail_line": "The door opens outward. You bounce. Embarrassing."
-				},
-				{
-					"label": "KNOCK POLITELY",
-					"outcome_id": "door_f1_knock_fail",
-					"is_advance": false,
-					"fail_line": "From inside: \"Go away. I'm watching my show.\""
-				},
-				{
-					"label": "FOOL!",
-					"outcome_id": "door_f1_fool_fail",
-					"is_advance": false,
-					"fail_line": "Nothing happens. You said it out loud. Why did you say it out loud."
-				},
-				{
-					"label": "WALK IN",
-					"outcome_id": "door_f1_walk_advance",
-					"is_advance": true
-				}
+				{"label": "KICK DOWN", "outcome_id": "door_f1_kick_fail", "is_advance": false, "fail_line": "The door opens outward. You bounce. Embarrassing."},
+				{"label": "KNOCK POLITELY", "outcome_id": "door_f1_knock_fail", "is_advance": false, "fail_line": "From inside: \"Go away. I'm watching my show.\""},
+				{"label": "FOOL!", "outcome_id": "door_f1_fool_fail", "is_advance": false, "fail_line": "Nothing happens. You said it out loud. Why did you say it out loud."},
+				{"label": "WALK IN", "outcome_id": "door_f1_walk_advance", "is_advance": true}
 			]
 		},
 		"fridge_f1": {
 			"title": "THE FRIDGE.",
 			"subtitle": "It hums at you suggestively.",
 			"options": [
-				{
-					"label": "OPEN IT",
-					"outcome_id": "fridge_f1_open_fail",
-					"is_advance": false,
-					"fail_line": "Just leftovers. Some of them blink."
-				},
-				{
-					"label": "KICK IT",
-					"outcome_id": "fridge_f1_kick_fail",
-					"is_advance": false,
-					"fail_line": "Your toe regrets this. The fridge does not."
-				},
-				{
-					"label": "WALK AWAY",
-					"outcome_id": "fridge_f1_leave_advance",
-					"is_advance": true
-				}
+				{"label": "OPEN IT", "outcome_id": "fridge_f1_open_fail", "is_advance": false, "fail_line": "Just leftovers. Some of them blink."},
+				{"label": "KICK IT", "outcome_id": "fridge_f1_kick_fail", "is_advance": false, "fail_line": "Your toe regrets this. The fridge does not."},
+				{"label": "WALK AWAY", "outcome_id": "fridge_f1_leave_advance", "is_advance": true}
+			]
+		},
+		"door_floor_2": {
+			"title": "THE CONFERENCE ROOM.",
+			"subtitle": "The Manager has scheduled this. There is a clipboard.",
+			"options": [
+				{"label": "BOOK 30 MIN", "outcome_id": "door_f2_book_fail", "is_advance": false, "fail_line": "The room is already booked. Recurring. You are not on the invite."},
+				{"label": "ASK NICELY", "outcome_id": "door_f2_ask_fail", "is_advance": false, "fail_line": "\"I'll get back to you.\" They will not."},
+				{"label": "SLIP IN", "outcome_id": "door_f2_slip_fail", "is_advance": false, "fail_line": "Door is glass. They saw. They wave you back into the hall."},
+				{"label": "ENTER LATE", "outcome_id": "door_f2_late_advance", "is_advance": true}
+			]
+		},
+		"printer_f2": {
+			"title": "THE PRINTER.",
+			"subtitle": "A red light blinks at you confidently.",
+			"options": [
+				{"label": "PRESS THE BUTTONS", "outcome_id": "printer_f2_press_fail", "is_advance": false, "fail_line": "It prints one beige page of nothing. Then another. Then a third."},
+				{"label": "OPEN A TRAY", "outcome_id": "printer_f2_tray_fail", "is_advance": false, "fail_line": "There is a sandwich in there. Don't ask."},
+				{"label": "WALK AWAY", "outcome_id": "printer_f2_leave_advance", "is_advance": true}
+			]
+		},
+		"door_floor_3": {
+			"title": "THE STOREFRONT.",
+			"subtitle": "The Algorithm has your route plotted on the door.",
+			"options": [
+				{"label": "FOLLOW ARROW", "outcome_id": "door_f3_follow_fail", "is_advance": false, "fail_line": "The arrow points back where you came from. Loops you twice."},
+				{"label": "IGNORE IT", "outcome_id": "door_f3_ignore_fail", "is_advance": false, "fail_line": "The arrow updates. It is patient. It will wait."},
+				{"label": "OPT OUT", "outcome_id": "door_f3_optout_fail", "is_advance": false, "fail_line": "\"Are you sure? We don't recommend it.\" You clicked NO. It is loading."},
+				{"label": "PUSH OPEN", "outcome_id": "door_f3_push_advance", "is_advance": true}
+			]
+		},
+		"phone_f3": {
+			"title": "THE PHONE.",
+			"subtitle": "It is ringing. There is no caller.",
+			"options": [
+				{"label": "ANSWER", "outcome_id": "phone_f3_answer_fail", "is_advance": false, "fail_line": "Music on hold. Slightly off-key. You don't recognize the song."},
+				{"label": "REJECT", "outcome_id": "phone_f3_reject_fail", "is_advance": false, "fail_line": "It rings again immediately. Different ringtone this time."},
+				{"label": "POCKET IT", "outcome_id": "phone_f3_pocket_advance", "is_advance": true}
 			]
 		}
 	}

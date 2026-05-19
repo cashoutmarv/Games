@@ -2,12 +2,13 @@ extends Node
 
 const ArenaScene := preload("res://scenes/arena.tscn")
 const BossRoomScene := preload("res://scenes/boss_room.tscn")
-const MainMenuScene := preload("res://scenes/main_menu.tscn")
+const DesktopHubScene := preload("res://scenes/desktop_hub.tscn")
 const PlayerScene := preload("res://scenes/actors/player.tscn")
 
 const RUN_DURATION_SECONDS := 600.0  # 10 minutes
 const ARENA_PLAYER_SPAWN := Vector2(540, 1500)
 const BOSS_ROOM_PLAYER_SPAWN := Vector2(540, 1500)
+const FINAL_FLOOR: int = 3
 
 @onready var _stage: Node = $Stage
 @onready var _hud: CanvasLayer = $HUD
@@ -48,6 +49,8 @@ func _load_arena() -> void:
 		_arena.queue_free()
 	_arena = ArenaScene.instantiate()
 	_stage.add_child(_arena)
+	if _arena.has_method("configure_for_floor"):
+		_arena.configure_for_floor(RunState.current_floor)
 	if _arena.has_signal("exit_to_boss"):
 		_arena.connect("exit_to_boss", _enter_boss_room)
 
@@ -56,12 +59,20 @@ func _enter_boss_room() -> void:
 		_arena.queue_free()
 		_arena = null
 	_boss_room = BossRoomScene.instantiate()
+	# Set boss_id from current floor BEFORE adding to tree so _ready picks
+	# the right config.
+	_boss_room.set("boss_id", "boss_floor_%d" % RunState.current_floor)
 	_stage.add_child(_boss_room)
 	# Move the existing player into the new room and reposition.
 	if _player != null and is_instance_valid(_player):
 		_player.get_parent().remove_child(_player)
 		_boss_room.add_child(_player)
 		_player.global_position = BOSS_ROOM_PLAYER_SPAWN
+		# Reset HP for the new fight.
+		if "max_hp" in _player:
+			_player.set("hp", int(_player.get("max_hp")))
+			if _player.has_signal("hp_changed"):
+				_player.emit_signal("hp_changed", int(_player.get("hp")), int(_player.get("max_hp")))
 	RunState.mark_reached_boss_room()
 	if _boss_room.has_signal("boss_defeated"):
 		_boss_room.connect("boss_defeated", _on_boss_defeated)
@@ -105,7 +116,27 @@ func _format_time(seconds: float) -> String:
 	return "%02d:%02d" % [m, s]
 
 func _on_boss_defeated() -> void:
-	_finish(true)
+	# Floor cleared (boss-side play has resolved). Advance to next floor
+	# or end the run as a win on the final floor.
+	if RunState.current_floor >= FINAL_FLOOR:
+		_finish(true)
+		return
+	RunState.current_floor += 1
+	_advance_to_next_floor()
+
+func _advance_to_next_floor() -> void:
+	# Tear down the just-cleared boss room (the boss-side player was already
+	# queue_freed before the ONWARD announcement). Spawn a fresh hero for
+	# the new floor's arena.
+	if _boss_room != null and is_instance_valid(_boss_room):
+		_boss_room.queue_free()
+		_boss_room = null
+	# Discard any stale player reference.
+	if _player != null and is_instance_valid(_player):
+		_player.queue_free()
+	_player = null
+	_load_arena()
+	_spawn_player(ARENA_PLAYER_SPAWN)
 
 func _on_player_died() -> void:
 	_finish(false)
@@ -114,4 +145,4 @@ func _finish(won: bool) -> void:
 	if not RunState.run_in_progress:
 		return
 	RunState.end_run(won)
-	get_tree().change_scene_to_packed(MainMenuScene)
+	get_tree().change_scene_to_packed(DesktopHubScene)

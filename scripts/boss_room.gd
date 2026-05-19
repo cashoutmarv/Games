@@ -35,6 +35,7 @@ var _boss_config: Dictionary = {}
 
 func _ready() -> void:
 	_load_boss_config()
+	_apply_boss_config_to_boss()
 	_orig_boss_position = _boss.global_position
 	if _boss.has_signal("defeated"):
 		_boss.connect("defeated", _on_hero_side_boss_defeated)
@@ -50,6 +51,38 @@ func _ready() -> void:
 	var intro: String = _config_dialog("intro")
 	if intro != "":
 		_dialogue_box.show_line(_interp(intro), 3.5)
+
+# Push the relevant hero-side stat profile + cosmetics from data/bosses.json
+# onto the embedded $Boss instance. Lets a single Boss script power F1/F2/F3
+# without duplicating scenes.
+func _apply_boss_config_to_boss() -> void:
+	if _boss == null or not is_instance_valid(_boss):
+		return
+	var hero_side: Dictionary = _boss_config.get("hero_side", {})
+	if "max_hp" in _boss and hero_side.has("max_hp"):
+		_boss.set("max_hp", int(hero_side["max_hp"]))
+		_boss.set("hp", int(hero_side["max_hp"]))
+		if _boss.has_signal("hp_changed"):
+			_boss.emit_signal("hp_changed", int(hero_side["max_hp"]), int(hero_side["max_hp"]))
+	for prop in ["move_speed", "contact_damage", "projectile_damage",
+			"dash_damage", "slam_damage", "telegraph_seconds"]:
+		if prop in _boss and hero_side.has(prop):
+			_boss.set(prop, hero_side[prop])
+	if "boss_id" in _boss:
+		_boss.set("boss_id", boss_id)
+	if "reveal_on_defeat" in _boss:
+		_boss.set("reveal_on_defeat", String(_boss_config.get("reveal_on_defeat", "hidden_depth")))
+	if "triggers_clash_on_phase_transition" in _boss:
+		_boss.set("triggers_clash_on_phase_transition",
+			bool(_boss_config.get("triggers_clash_on_phase_transition", false)))
+	# Sprite tint per floor.
+	var color_arr: Array = _boss_config.get("sprite_color", [])
+	if color_arr.size() == 4 and _boss.has_node("Sprite"):
+		var c: Color = Color(color_arr[0], color_arr[1], color_arr[2], color_arr[3])
+		(_boss.get_node("Sprite") as ColorRect).color = c
+	# Reveal-on-defeat layer wiring: when this boss is beaten, unlock the
+	# associated reveal layer in the director.
+	# (Done lazily here so it survives boss_room reuse across floors.)
 
 func _load_boss_config() -> void:
 	if not FileAccess.file_exists("res://data/bosses.json"):
@@ -94,6 +127,10 @@ func _on_hero_side_boss_defeated() -> void:
 		# Stray fire — shouldn't happen since the boss is disabled during
 		# boss-side. Safe to ignore.
 		return
+	# Show the reveal dialog before kicking off the swap announcement.
+	var line: String = _config_dialog("reveal_on_defeat")
+	if line != "":
+		_dialogue_box.show_line(_interp(line), 3.0)
 	BossSwap.request_swap(boss_id)
 
 func _on_player_died() -> void:

@@ -15,6 +15,12 @@ signal pattern_started(pattern_id: String)
 @export var slam_damage: int = 22
 @export var telegraph_seconds: float = 0.7
 @export var boss_id: String = "boss_floor_1"
+@export var reveal_on_defeat: String = "hidden_depth"
+# F2+ trigger a clash mini-game on each phase transition. Damages the
+# loser when resolved.
+@export var triggers_clash_on_phase_transition: bool = false
+@export var clash_win_damage: int = 60
+@export var clash_loss_damage: int = 35
 
 # Patterns recharge with a base cooldown that shortens by phase.
 @export var pattern_cooldown_phase_1: float = 2.4
@@ -45,6 +51,9 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	if _defeated:
+		return
+	# Freeze hero-side AI while a clash overlay is up.
+	if ClashDirector.is_clash_active():
 		return
 	var player := _get_player()
 	# Idle drift: amble toward the player so the arena stays engaged.
@@ -206,6 +215,26 @@ func _enter_phase(phase: int) -> void:
 	_pattern = Pattern.IDLE
 	_telegraph_timer = 0.0
 	wants_to_talk.emit(_phase_taunt(phase))
+	if triggers_clash_on_phase_transition and phase >= Phase.TWO:
+		call_deferred("_initiate_phase_clash")
+
+# Cinematic phase-transition clash. Both fighters freeze; player picks one
+# of BREAK / FAKE / COMMIT; ClashDirector resolves; damage applied.
+func _initiate_phase_clash() -> void:
+	# Pause normal physics: pattern timer + telegraph timer pause via a flag.
+	_pattern = Pattern.IDLE
+	_pattern_timer = max(_pattern_timer, 1.5)
+	var parent: Node = get_parent()
+	if parent == null:
+		return
+	var winner: String = await ClashDirector.trigger_clash(self, parent)
+	if winner == "player":
+		take_damage(clash_win_damage)
+	elif winner == "boss":
+		var p := _get_player()
+		if p != null and p.has_method("take_damage"):
+			p.take_damage(clash_loss_damage)
+	# Tie: no damage; both narratively bounce.
 
 func _phase_taunt(phase: int) -> String:
 	match phase:
@@ -215,12 +244,12 @@ func _phase_taunt(phase: int) -> String:
 
 func _on_defeat() -> void:
 	_defeated = true
-	# Unlock the hidden-depth reveal layer + record the kill.
-	RevealDirector.unlock("hidden_depth")
+	# Unlock the floor-specific reveal layer + record the kill.
+	if reveal_on_defeat != "":
+		RevealDirector.unlock(reveal_on_defeat)
 	var bd: Array = SaveSystem.state.get("bosses_defeated", [])
 	if not bd.has(boss_id):
 		bd.append(boss_id)
 		SaveSystem.state.bosses_defeated = bd
 		SaveSystem.save()
-	wants_to_talk.emit("Every hit had a window. Every dodge could cancel. You did it with a {weapon} — but you didn't know any of it.")
 	defeated.emit()

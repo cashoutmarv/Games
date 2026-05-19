@@ -16,6 +16,9 @@ var damage_bonus: int = 0
 # Set by weapon_input.gd via set_weapon() before the arena loads.
 var weapon_text: String = ""
 var weapon_data: Dictionary = {}
+# 1-indexed floor counter. Advances on boss_room.boss_defeated; run ends
+# when it exceeds 3 (the final boss in v5 will short-circuit).
+var current_floor: int = 1
 
 func _ready() -> void:
 	recompute_phase()
@@ -34,6 +37,8 @@ func start_run() -> void:
 	run_in_progress = true
 	reached_boss_room_this_run = false
 	damage_bonus = 0
+	current_floor = 1
+	PatternTracker.reset()
 	recompute_phase()
 	ReplayRecorder.start()
 	run_started.emit()

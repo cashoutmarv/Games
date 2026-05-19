@@ -54,6 +54,10 @@ var _rewind_snapshots: Array = []
 const _SNAPSHOT_INTERVAL: float = 0.25
 const _SNAPSHOT_BUFFER: int = 40  # 10s back at 0.25s spacing (F1 perk window)
 var _snapshot_timer: float = 0.0
+# F3 body-reflex dodge cooldown. Auto-dodges incoming damage when ready.
+var _reflex_cooldown: float = 0.0
+const _REFLEX_COOLDOWN_SECONDS: float = 3.0
+const _REFLEX_IFRAMES: float = 0.4
 var _replay_frames: Array = []
 var _replay_index: int = 0
 var _replay_fired_this_tick: bool = false
@@ -110,8 +114,11 @@ func _physics_process(delta: float) -> void:
 
 	_tick_timers(delta)
 
-	# Movement: dodge velocity overrides steer during the dodge.
-	if _is_dodging:
+	# Movement: dodge velocity overrides steer during the dodge. Clash
+	# overlay halts movement so the "both freeze" beat reads cleanly.
+	if ClashDirector.is_clash_active():
+		velocity = Vector2.ZERO
+	elif _is_dodging:
 		velocity = _dodge_velocity
 	else:
 		velocity = steer_input * move_speed
@@ -158,6 +165,7 @@ func _tick_timers(delta: float) -> void:
 	_fire_timer = max(0.0, _fire_timer - delta)
 	_dodge_cooldown_timer = max(0.0, _dodge_cooldown_timer - delta)
 	_parry_cooldown_timer = max(0.0, _parry_cooldown_timer - delta)
+	_reflex_cooldown = max(0.0, _reflex_cooldown - delta)
 	if _is_dodging:
 		_dodge_timer -= delta
 		if _dodge_timer <= 0.0:
@@ -170,6 +178,9 @@ func _tick_timers(delta: float) -> void:
 		_hit_flash_timer = max(0.0, _hit_flash_timer - delta)
 
 func _handle_combat_input(_delta: float) -> void:
+	# Freeze input while a clash overlay is up — both fighters freeze.
+	if ClashDirector.is_clash_active():
+		return
 	# Dodge — always available, always cancels current action.
 	if Input.is_action_just_pressed("dodge_roll") and _dodge_cooldown_timer <= 0.0:
 		_start_dodge()
@@ -184,6 +195,15 @@ func _handle_combat_input(_delta: float) -> void:
 			and _parry_cooldown_timer <= 0.0:
 		_parry_timer = parry_window
 		_parry_cooldown_timer = parry_cooldown
+		PatternTracker.record_parry()
+		return
+
+	# Force-clash — F2 perk. Initiates a clash with the currently active
+	# hero-side boss on demand.
+	if Input.is_action_just_pressed("force_clash") \
+			and BossSwap.has_ability("clash_trigger") \
+			and not ClashDirector.is_clash_active():
+		_initiate_force_clash()
 		return
 
 	# Charge attack — only when revealed. Hold fire to charge.
@@ -212,7 +232,25 @@ func _start_dodge() -> void:
 	if dir.length_squared() < 0.01:
 		dir = aim_direction
 	_dodge_velocity = dir.normalized() * dodge_speed
+	PatternTracker.record_dodge()
 	AudioBus.play_sfx("player_dodge")
+
+# F2 perk: force a clash with whatever boss is in the scene.
+func _initiate_force_clash() -> void:
+	var bosses: Array = get_tree().get_nodes_in_group("boss")
+	for b in bosses:
+		if not is_instance_valid(b) or b == self:
+			continue
+		call_deferred("_resolve_clash_with", b)
+		return
+
+func _resolve_clash_with(boss_node: Node) -> void:
+	var winner: String = await ClashDirector.trigger_clash(boss_node, get_parent())
+	if winner == "player":
+		if boss_node != null and boss_node.has_method("take_damage"):
+			boss_node.take_damage(60)
+	elif winner == "boss":
+		take_damage(30)
 
 func _fire_basic() -> void:
 	_spawn_projectile(1.0)
@@ -338,6 +376,17 @@ func take_damage(amount: int) -> void:
 		# logic (it queries player.is_parrying()).
 		_parry_timer = 0.0
 		AudioBus.play_sfx("player_parry")
+		# F2 perk: an active parry triggers a clash with the hero-side boss.
+		if BossSwap.has_ability("clash_trigger") and not is_boss_side \
+				and not ClashDirector.is_clash_active():
+			_clash_after_parry()
+		return
+	# F3 perk: body-reflex auto-dodge if cooldown is ready.
+	if BossSwap.has_ability("prediction_reflex") and _reflex_cooldown <= 0.0 \
+			and not is_boss_side:
+		_reflex_cooldown = _REFLEX_COOLDOWN_SECONDS
+		_iframes_timer = _REFLEX_IFRAMES
+		AudioBus.play_sfx("player_dodge")
 		return
 	hp = max(0, hp - amount)
 	hp_changed.emit(hp, max_hp)
@@ -351,6 +400,14 @@ func take_damage(amount: int) -> void:
 		return
 	died.emit()
 	queue_free()
+
+func _clash_after_parry() -> void:
+	var bosses: Array = get_tree().get_nodes_in_group("boss")
+	for b in bosses:
+		if not is_instance_valid(b) or b == self:
+			continue
+		call_deferred("_resolve_clash_with", b)
+		return
 
 # True if the rewind ability fired and the player was saved from death.
 func _try_rewind() -> bool:
