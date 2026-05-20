@@ -1,0 +1,41 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbbmysapp0000"]
+
+[ext_resource type="Script" path="res://scripts/desktop/mystery_app.gd" id="1_my"]
+
+[node name="MysteryApp" type="CanvasLayer"]
+layer = 16
+script = ExtResource("1_my")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.75)
+
+[node name="Window" type="PanelContainer" parent="."]
+offset_left = 60.0
+offset_top = 200.0
+offset_right = 1020.0
+offset_bottom = 1200.0
+modulate = Color(0.85, 0.7, 1.0, 1)
+
+[node name="V" type="VBoxContainer" parent="Window"]
+theme_override_constants/separation = 12
+
+[node name="Header" type="Label" parent="Window/V"]
+text = "???.exe — corrupted README"
+horizontal_alignment = 0
+theme_override_font_sizes/font_size = 22
+
+[node name="Body" type="Label" parent="Window/V"]
+text = ""
+horizontal_alignment = 0
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 20
+modulate = Color(1, 1, 1, 1)
+
+[node name="Footer" type="HBoxContainer" parent="Window/V"]
+alignment = 2
+
+[node name="Close" type="Button" parent="Window/V/Footer"]
+text = "Close"
+custom_minimum_size = Vector2(120, 48)

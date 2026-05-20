@@ -54,6 +54,13 @@ func _on_option_pressed(opt: Dictionary) -> void:
 	if bool(opt.get("is_advance", false)):
 		advance_chosen.emit(outcome_id)
 		return
+	# gate_advance options advance ONLY when EndingDirector says the true-
+	# true gate has unlocked (ending 1 + real-time delay elapsed). Until
+	# then they fail-loop with their authored line, hiding the gate in
+	# plain sight among other fails.
+	if bool(opt.get("gate_advance", false)) and EndingDirector.is_true_true_gate_ready():
+		advance_chosen.emit(outcome_id)
+		return
 	# Fail-loop: show the fail line for ~1.6s, hide buttons, then re-render.
 	var fail_line: String = String(opt.get("fail_line", "..."))
 	_flash_label.text = fail_line

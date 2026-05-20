@@ -1,11 +1,19 @@
 extends Control
 
 # Ending 1: the player has defeated the final boss for the first time.
-# Plays a short authored cutscene of dialog lines, then routes to the
-# desktop hub which now persists as the new "main menu" state. v6 wires
-# the true-true gate; for v5 this scene just plays once and exits.
+# Walks the player through a short authored cutscene, then drops them
+# at an end-of-game Stickmin choice screen that hides the true-true
+# gate among ordinary fail-loop options.
+#
+# - Pre-gate (no ending 1 yet, or ending 1 but the 12-hour delay has
+#   not elapsed): every option either fail-loops or routes to the
+#   desktop hub as normal.
+# - Gate-ready (ending 1 seen + delay elapsed): the "LOOK AT THE
+#   MONITOR" option flips to advance and routes to the true-true
+#   stand-up cutscene.
 
 const DesktopHubScene := preload("res://scenes/desktop_hub.tscn")
+const EndingTrueTrueScene := preload("res://scenes/endings/ending_true_true.tscn")
 
 const LINES: Array = [
 	"Black screen. Title bar steady. No more taunts.",
@@ -22,10 +30,9 @@ const LINES: Array = [
 var _index: int = 0
 
 func _ready() -> void:
-	# Restore the OS title bar in case the F4 cheats left it in a weird state.
 	DisplayServer.window_set_title("Boss Battle Belay")
 	_next_button.pressed.connect(_advance)
-	_exit_button.pressed.connect(_to_desktop)
+	_exit_button.pressed.connect(_open_end_choice)
 	_exit_button.visible = false
 	_render()
 
@@ -39,5 +46,12 @@ func _advance() -> void:
 	_index = min(_index + 1, LINES.size() - 1)
 	_render()
 
-func _to_desktop() -> void:
-	get_tree().change_scene_to_packed(DesktopHubScene)
+func _open_end_choice() -> void:
+	_exit_button.disabled = true
+	var outcome: String = await ChoiceDirector.show_screen("end_choice", self)
+	# Route based on which option the player picked. Only the true-true
+	# outcome jumps to ending 2; everything else returns to the desktop.
+	if outcome == "end_monitor_true_true":
+		get_tree().change_scene_to_packed(EndingTrueTrueScene)
+	else:
+		get_tree().change_scene_to_packed(DesktopHubScene)

@@ -103,6 +103,16 @@
 				{"label": "READ IT", "outcome_id": "glitch_f4_read_fail", "is_advance": false, "fail_line": "\"--saving--\" it says. The save flag is still down."},
 				{"label": "LOOK AWAY", "outcome_id": "glitch_f4_away_advance", "is_advance": true}
 			]
+		},
+		"end_choice": {
+			"title": "THE CURSOR IS BLINKING.",
+			"subtitle": "It is waiting for you to do something.",
+			"options": [
+				{"label": "CLOSE THE WINDOW", "outcome_id": "end_close_advance", "is_advance": true},
+				{"label": "READ THE README", "outcome_id": "end_readme_fail", "is_advance": false, "fail_line": "It says the same thing it said before. Maybe a little less politely."},
+				{"label": "LOOK AT THE MONITOR", "outcome_id": "end_monitor_true_true", "is_advance": false, "gate_advance": true, "fail_line": "It is just a screen. There is nothing to see. Maybe wait."},
+				{"label": "STAY HERE", "outcome_id": "end_stay_fail", "is_advance": false, "fail_line": "Nothing happens for a while. The fan whirs. You blink."}
+			]
 		}
 	}
 }

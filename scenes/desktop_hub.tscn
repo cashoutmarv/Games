@@ -57,6 +57,21 @@ custom_minimum_size = Vector2(0, 160)
 text = "Settings.exe"
 theme_override_font_sizes/font_size = 32
 
+[node name="ModsIcon" type="PanelContainer" parent="V/Icons"]
+custom_minimum_size = Vector2(0, 160)
+
+[node name="Button" type="Button" parent="V/Icons/ModsIcon"]
+text = "mods/"
+theme_override_font_sizes/font_size = 32
+
+[node name="MysteryIcon" type="PanelContainer" parent="V/Icons"]
+custom_minimum_size = Vector2(0, 160)
+modulate = Color(0.7, 0.55, 0.95, 1)
+
+[node name="Button" type="Button" parent="V/Icons/MysteryIcon"]
+text = "???.exe"
+theme_override_font_sizes/font_size = 32
+
 [node name="Footer" type="VBoxContainer" parent="V"]
 size_flags_vertical = 8
 theme_override_constants/separation = 6
@@ -96,3 +111,6 @@ text = "Reset save"
 
 [node name="UnlockReveal" type="Button" parent="DebugPanel/V"]
 text = "Unlock hidden_depth"
+
+[node name="CompleteEnding1" type="Button" parent="DebugPanel/V"]
+text = "Spoof ending 1 (gate ready)"

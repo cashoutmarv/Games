@@ -1,0 +1,61 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbbmodsapp000"]
+
+[ext_resource type="Script" path="res://scripts/desktop/mods_app.gd" id="1_mods"]
+
+[node name="ModsApp" type="CanvasLayer"]
+layer = 16
+script = ExtResource("1_mods")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.75)
+
+[node name="Window" type="PanelContainer" parent="."]
+offset_left = 40.0
+offset_top = 80.0
+offset_right = 1040.0
+offset_bottom = 1840.0
+
+[node name="V" type="VBoxContainer" parent="Window"]
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="Window/V"]
+
+[node name="Title" type="Label" parent="Window/V/Header"]
+text = "mods/ — community packs"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+
+[node name="Summary" type="Label" parent="Window/V"]
+text = ""
+horizontal_alignment = 0
+theme_override_font_sizes/font_size = 18
+modulate = Color(0.85, 0.9, 1, 1)
+
+[node name="PathLabel" type="Label" parent="Window/V"]
+text = ""
+horizontal_alignment = 0
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.75, 0.85, 1)
+
+[node name="Scroll" type="ScrollContainer" parent="Window/V"]
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 1400)
+
+[node name="List" type="VBoxContainer" parent="Window/V/Scroll"]
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Footer" type="HBoxContainer" parent="Window/V"]
+alignment = 2
+theme_override_constants/separation = 12
+
+[node name="Reload" type="Button" parent="Window/V/Footer"]
+text = "Reload"
+custom_minimum_size = Vector2(120, 48)
+
+[node name="Close" type="Button" parent="Window/V/Footer"]
+text = "Close"
+custom_minimum_size = Vector2(120, 48)
