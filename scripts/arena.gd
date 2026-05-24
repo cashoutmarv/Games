@@ -56,9 +56,10 @@ func _ready() -> void:
 	_exit_button.pressed.connect(_on_exit)
 	if _fridge_button != null:
 		_fridge_button.pressed.connect(_on_scatter)
-	# Default palette if configure_for_floor never gets called (e.g. test scene).
-	if _floor == 1:
-		_apply_floor_theme(1)
+	# Live runs always call configure_for_floor() right after add_child from
+	# run.gd, which sets the proper palette. No fallback theme here — if a
+	# test or editor preview loads arena.tscn directly, the .tscn defaults
+	# (apartment palette) carry through.
 
 func configure_for_floor(floor: int) -> void:
 	_floor = floor

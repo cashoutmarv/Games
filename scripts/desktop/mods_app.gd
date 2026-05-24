@@ -93,8 +93,7 @@ func _make_pack_row(pack: Dictionary) -> Control:
 func _on_reload() -> void:
 	# Re-run the WeaponDict scan + refresh this view. Lets a player drop
 	# a new pack file and see it appear without restarting the game.
-	if WeaponDict.has_method("_load_all_dicts"):
-		WeaponDict._load_all_dicts()
+	WeaponDict.reload_dicts()
 	_render()
 
 func _on_close() -> void:

@@ -147,7 +147,6 @@ func _do_dash() -> void:
 	# Single fast leap toward _dash_target. Damage applied via overlap check.
 	var dir: Vector2 = (_dash_target - global_position).normalized()
 	var leap: Vector2 = dir * 360.0
-	var before: Vector2 = global_position
 	global_position += leap
 	# Apply contact damage if we ended up on the player.
 	var player := _get_player()

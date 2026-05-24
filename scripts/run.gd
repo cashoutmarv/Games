@@ -21,6 +21,9 @@ var _player: Node = null
 var _time_left: float = RUN_DURATION_SECONDS
 
 func _ready() -> void:
+	# Restore the OS title bar if the player is closing the window — F4's
+	# cheat title-bar writes shouldn't bleed across into the next session.
+	get_tree().root.close_requested.connect(_on_window_close_requested)
 	# Guard: a weapon must be chosen before the arena loads. If the player
 	# entered run.tscn directly without going through weapon_input (e.g.
 	# from a deep link), bounce them to the prompt.
@@ -33,6 +36,9 @@ func _ready() -> void:
 	# background.
 	_load_arena()
 	_spawn_player(ARENA_PLAYER_SPAWN)
+
+func _on_window_close_requested() -> void:
+	DisplayServer.window_set_title("Boss Battle Belay")
 
 func _bounce_to_scene(packed: PackedScene) -> void:
 	get_tree().change_scene_to_packed(packed)

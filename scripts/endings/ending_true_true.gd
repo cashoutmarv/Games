@@ -34,8 +34,10 @@ func _process(delta: float) -> void:
 	if _done:
 		return
 	_step_t += delta
-	# Fade up over the duration of the last beat.
-	if _index >= _BEATS.size() - 1:
+	# Fade up only during the actual last beat. _advance_step pre-increments
+	# _index, so when the LAST beat is currently being shown _index equals
+	# _BEATS.size() (the entry one past the last index).
+	if _index == _BEATS.size():
 		_fade.modulate.a = clamp(_step_t / _step_dur, 0.0, 1.0)
 	if _step_t >= _step_dur:
 		_step_t = 0.0

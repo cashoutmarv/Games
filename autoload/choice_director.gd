@@ -45,7 +45,9 @@ func _load_screens() -> void:
 func show_screen(screen_id: String, parent_node: Node) -> String:
 	var cfg: Dictionary = _screens.get(screen_id, {})
 	if cfg.is_empty():
-		push_warning("ChoiceDirector: screen '%s' not found" % screen_id)
+		# Loud failure — callers branch on the outcome string, so a silent
+		# no-op (returning "") would just make the buttons appear inert.
+		push_error("ChoiceDirector: screen '%s' not found in data/choices.json" % screen_id)
 		return ""
 	var overlay: CanvasLayer = ChoiceScreenScene.instantiate()
 	parent_node.add_child(overlay)

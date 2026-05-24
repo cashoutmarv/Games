@@ -31,6 +31,11 @@ const _DEFAULT_STATS_BY_ARCHETYPE: Dictionary = {
 func _ready() -> void:
 	_load_all_dicts()
 
+# Public re-scan of bundled + sideloaded dictionaries. Called by the mods
+# browser after the player drops a new pack into user://mods/dict/.
+func reload_dicts() -> void:
+	_load_all_dicts()
+
 func _load_all_dicts() -> void:
 	_nouns.clear()
 	_adjectives.clear()
