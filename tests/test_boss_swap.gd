@@ -53,9 +53,7 @@ func _initialize() -> void:
 	# state-machine contract directly. The boss_room.gd code path is the
 	# only place that should call request_swap, and only on boss_defeated.)
 	var captured_first_ever := [false]
-	BossSwap.swap_requested.connect(func(_bid: String, is_first_ever: bool):
-		captured_first_ever[0] = is_first_ever
-	, CONNECT_ONE_SHOT)
+	BossSwap.swap_requested.connect(func(_bid: String, is_first_ever: bool): captured_first_ever[0] = is_first_ever, CONNECT_ONE_SHOT)
 
 	BossSwap.request_swap("boss_floor_1")
 	_expect(BossSwap.current_state == BossSwap.SwapState.ANNOUNCING_SWAP,
@@ -99,9 +97,7 @@ func _initialize() -> void:
 	# --- Second-swap flag: first_ever should be false now -----------------
 	BossSwap.reset_for_new_run()
 	var captured_second := [true]
-	BossSwap.swap_requested.connect(func(_bid: String, is_first_ever: bool):
-		captured_second[0] = is_first_ever
-	, CONNECT_ONE_SHOT)
+	BossSwap.swap_requested.connect(func(_bid: String, is_first_ever: bool): captured_second[0] = is_first_ever, CONNECT_ONE_SHOT)
 	BossSwap.request_swap("boss_floor_1")
 	_expect(captured_second[0] == false,
 		"subsequent swap reports first_ever=false", failures)

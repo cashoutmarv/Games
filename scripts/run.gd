@@ -23,7 +23,10 @@ var _time_left: float = RUN_DURATION_SECONDS
 func _ready() -> void:
 	# Restore the OS title bar if the player is closing the window — F4's
 	# cheat title-bar writes shouldn't bleed across into the next session.
-	get_tree().root.close_requested.connect(_on_window_close_requested)
+	# Guard against repeat-connect when run.tscn loads multiple times in a session.
+	var root := get_tree().root
+	if not root.close_requested.is_connected(_on_window_close_requested):
+		root.close_requested.connect(_on_window_close_requested)
 	# Guard: a weapon must be chosen before the arena loads. If the player
 	# entered run.tscn directly without going through weapon_input (e.g.
 	# from a deep link), bounce them to the prompt.
