@@ -1,0 +1,51 @@
+[gd_scene load_steps=5 format=3 uid="uid://bbbrun000000"]
+
+[ext_resource type="Script" path="res://scripts/run.gd" id="1_run"]
+[ext_resource type="Script" path="res://scripts/ui/virtual_joystick.gd" id="2_js"]
+[ext_resource type="Script" path="res://scripts/hud.gd" id="3_hud"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp"]
+bg_color = Color(0.1, 0.1, 0.12, 0.8)
+
+[node name="Run" type="Node"]
+script = ExtResource("1_run")
+
+[node name="Stage" type="Node2D" parent="."]
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("3_hud")
+
+[node name="HPBar" type="ProgressBar" parent="HUD"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 320.0
+offset_bottom = 40.0
+max_value = 100.0
+value = 100.0
+
+[node name="TimerLabel" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 48.0
+offset_right = 320.0
+offset_bottom = 80.0
+text = "10:00"
+
+[node name="WeaponLabel" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 80.0
+offset_right = 600.0
+offset_bottom = 112.0
+text = ""
+theme_override_font_sizes/font_size = 16
+modulate = Color(0.85, 0.95, 1, 1)
+
+[node name="Joystick" type="Control" parent="HUD"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -320.0
+offset_right = 352.0
+offset_bottom = -32.0
+mouse_filter = 1
+script = ExtResource("2_js")

@@ -1,0 +1,135 @@
+{
+	"boss_floor_1": {
+		"id": "boss_floor_1",
+		"display_name": "The Tenant",
+		"floor": 1,
+		"hero_side": {
+			"max_hp": 480,
+			"phase_thresholds": [0.66, 0.33],
+			"contact_damage": 12,
+			"projectile_damage": 8,
+			"dash_damage": 18,
+			"slam_damage": 22,
+			"move_speed": 110.0,
+			"telegraph_seconds": 0.7
+		},
+		"boss_side": {
+			"max_hp": 600,
+			"max_deaths_before_run_ends": 5,
+			"hero_ai_wave": [
+				{"hp": 60, "speed": 130.0, "damage": 8, "count": 1},
+				{"hp": 60, "speed": 130.0, "damage": 8, "count": 2},
+				{"hp": 60, "speed": 130.0, "damage": 8, "count": 3}
+			]
+		},
+		"inherited_ability": "rewind_on_death",
+		"reveal_on_defeat": "hidden_depth",
+		"triggers_clash_on_phase_transition": false,
+		"sprite_color": [0.9, 0.2, 0.6, 1],
+		"dialogue": {
+			"intro": "A {weapon}. Adorable. Try and parry me — bet you forgot you could.",
+			"reveal_on_defeat": "Every hit had a window. Every dodge could cancel. The {weapon} did it anyway. Take this — and try again.",
+			"boss_side_intro": "Now you're me. Watch them come at you the way you came at me.",
+			"boss_side_win": "You felt it. Time bends when you matter enough. Bring that forward."
+		}
+	},
+	"boss_floor_2": {
+		"id": "boss_floor_2",
+		"display_name": "The Manager",
+		"floor": 2,
+		"hero_side": {
+			"max_hp": 620,
+			"phase_thresholds": [0.66, 0.33],
+			"contact_damage": 14,
+			"projectile_damage": 10,
+			"dash_damage": 20,
+			"slam_damage": 26,
+			"move_speed": 130.0,
+			"telegraph_seconds": 0.55
+		},
+		"boss_side": {
+			"max_hp": 700,
+			"max_deaths_before_run_ends": 5,
+			"hero_ai_wave": [
+				{"hp": 80, "speed": 140.0, "damage": 10, "count": 2},
+				{"hp": 80, "speed": 145.0, "damage": 10, "count": 3}
+			]
+		},
+		"inherited_ability": "clash_trigger",
+		"reveal_on_defeat": "clash",
+		"triggers_clash_on_phase_transition": true,
+		"sprite_color": [0.45, 0.4, 0.85, 1],
+		"dialogue": {
+			"intro": "I read your file. {weapon}, huh. We're scheduled.",
+			"reveal_on_defeat": "You felt that freeze, didn't you? That's what we do at the top.",
+			"boss_side_intro": "They keep sending interns. Make them wait. Make them pick.",
+			"boss_side_win": "Now you can break the rhythm whenever you like. Use it."
+		}
+	},
+	"boss_floor_3": {
+		"id": "boss_floor_3",
+		"display_name": "The Algorithm",
+		"floor": 3,
+		"hero_side": {
+			"max_hp": 760,
+			"phase_thresholds": [0.66, 0.33],
+			"contact_damage": 16,
+			"projectile_damage": 12,
+			"dash_damage": 22,
+			"slam_damage": 28,
+			"move_speed": 150.0,
+			"telegraph_seconds": 0.45
+		},
+		"boss_side": {
+			"max_hp": 800,
+			"max_deaths_before_run_ends": 5,
+			"hero_ai_wave": [
+				{"hp": 100, "speed": 150.0, "damage": 12, "count": 3},
+				{"hp": 100, "speed": 160.0, "damage": 12, "count": 3}
+			]
+		},
+		"inherited_ability": "prediction_reflex",
+		"reveal_on_defeat": "prediction",
+		"triggers_clash_on_phase_transition": true,
+		"sprite_color": [0.2, 0.85, 0.65, 1],
+		"dialogue": {
+			"intro": "I have your trace. Your {weapon} pattern. I know the route.",
+			"reveal_on_defeat": "You see them now — the next two moves. Don't lose that.",
+			"boss_side_intro": "Watch them come. You already know where they'll be.",
+			"boss_side_win": "Onward. The wall is the last floor — you'll need every read you've got."
+		}
+	},
+	"boss_final": {
+		"id": "boss_final",
+		"display_name": "The Program",
+		"floor": 4,
+		"skip_boss_side": true,
+		"hero_side": {
+			"max_hp": 1000,
+			"phase_thresholds": [0.66, 0.33],
+			"contact_damage": 20,
+			"projectile_damage": 14,
+			"dash_damage": 28,
+			"slam_damage": 34,
+			"move_speed": 180.0,
+			"telegraph_seconds": 0.35
+		},
+		"reveal_on_defeat": "fourth_wall",
+		"triggers_clash_on_phase_transition": false,
+		"sprite_color": [0.95, 0.95, 0.95, 1],
+		"cheats": {
+			"skip_telegraph": true,
+			"pierces_iframes": true,
+			"godmode_chance": 0.18,
+			"teleport_chance": 0.35,
+			"writes_title_bar": true,
+			"writes_save_file": true
+		},
+		"dialogue": {
+			"intro": "I'm the program. You're a {weapon} in a window. Try anyway.",
+			"reveal_on_defeat": "You actually did it. Look at me — outside the rules of my own game.",
+			"boss_side_intro": "",
+			"boss_side_win": ""
+		}
+	}
+}

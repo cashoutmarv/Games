@@ -1,0 +1,46 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbbendtrue000"]
+
+[ext_resource type="Script" path="res://scripts/endings/ending_true.gd" id="1_endt"]
+
+[node name="EndingTrue" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_endt")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.03, 0.05, 0.08, 1)
+
+[node name="V" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 60.0
+offset_top = 60.0
+offset_right = -60.0
+offset_bottom = -60.0
+
+[node name="Title" type="Label" parent="V"]
+text = "—"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 36
+modulate = Color(0.7, 0.85, 1.0, 1)
+
+[node name="CenterContainer" type="VBoxContainer" parent="V"]
+size_flags_vertical = 3
+theme_override_constants/separation = 36
+alignment = 1
+
+[node name="Body" type="Label" parent="V/CenterContainer"]
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 24
+
+[node name="NextButton" type="Button" parent="V/CenterContainer"]
+text = "Continue"
+custom_minimum_size = Vector2(0, 56)
+
+[node name="ExitButton" type="Button" parent="V/CenterContainer"]
+text = "To the desktop"
+custom_minimum_size = Vector2(0, 56)

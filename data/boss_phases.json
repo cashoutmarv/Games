@@ -1,0 +1,7 @@
+{
+  "phases": [
+    {"hp_pct_min": 0.66, "hp_pct_max": 1.00, "behavior": "circle_strafe"},
+    {"hp_pct_min": 0.33, "hp_pct_max": 0.66, "behavior": "dash"},
+    {"hp_pct_min": 0.00, "hp_pct_max": 0.33, "behavior": "desperate"}
+  ]
+}
