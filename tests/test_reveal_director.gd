@@ -23,9 +23,7 @@ func _initialize() -> void:
 
 	# --- Unlock + signal --------------------------------------------------
 	var observed := [""]
-	RevealDirector.reveal_unlocked.connect(func(layer_id: String):
-		observed[0] = layer_id
-	, CONNECT_ONE_SHOT)
+	RevealDirector.reveal_unlocked.connect(func(layer_id: String): observed[0] = layer_id, CONNECT_ONE_SHOT)
 	RevealDirector.unlock("hidden_depth")
 	_expect(observed[0] == "hidden_depth",
 		"reveal_unlocked signal fires with correct id", failures)

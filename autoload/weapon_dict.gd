@@ -80,11 +80,19 @@ func resolve(text: String) -> Dictionary:
 	var lowered: String = text.strip_edges().to_lower()
 	if lowered == "":
 		lowered = "fist"
-	var tokens: Array = lowered.split(" ", false)
-	var noun: String = String(tokens[-1])
+	# split() returns PackedStringArray; normalize to Array[String] and
+	# index by size to avoid PackedArray negative-index quirks on older
+	# Godot 4.x point releases.
+	var raw: PackedStringArray = lowered.split(" ", false)
+	var tokens: Array[String] = []
+	for s in raw:
+		tokens.append(String(s))
+	if tokens.is_empty():
+		tokens.append("fist")
+	var noun: String = tokens[tokens.size() - 1]
 	var adjectives: Array = []
 	for i in range(tokens.size() - 1):
-		adjectives.append(String(tokens[i]))
+		adjectives.append(tokens[i])
 	var noun_entry: Dictionary = _nouns.get(noun, {})
 	var archetype: String
 	var base_tags: Array = []

@@ -243,8 +243,14 @@ func _spawn_hero_ai(wave: Dictionary, index: int, total: int) -> void:
 
 func _on_hero_ai_died(ai: Node) -> void:
 	_hero_ais.erase(ai)
-	# Clear any null/dead references.
-	_hero_ais = _hero_ais.filter(func(n): return is_instance_valid(n))
+	# Clear any null/dead references. Typed Array[Node] doesn't accept a
+	# generic Array from .filter() in Godot 4.6's stricter type checker, so
+	# build a fresh typed array manually.
+	var alive: Array[Node] = []
+	for n in _hero_ais:
+		if is_instance_valid(n):
+			alive.append(n)
+	_hero_ais = alive
 	if _hero_ais.is_empty():
 		_boss_side_wave += 1
 		var waves: Array = _boss_config.get("boss_side", {}).get("hero_ai_wave", [])
